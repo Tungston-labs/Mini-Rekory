@@ -15,7 +15,7 @@ import styles from "./style";
 
 const HomeScreen = () => {
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1 ,backgroundColor: "#F6F7F8"  }} edges={["top"]}>
     <View style={styles.container}>
         <View style={styles.header}>
           <View>

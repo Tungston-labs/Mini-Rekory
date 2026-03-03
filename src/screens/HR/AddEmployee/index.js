@@ -1,27 +1,27 @@
-import React, { useState } from "react";
-import { Alert } from "react-native";
+import React, { useState, useCallback } from "react";
+import { Alert, KeyboardAvoidingView, Platform } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { useAddEmployee } from "../../../hooks/useEmployees";
 import AddEmployeeView from "./AddEmployeeView";
 import { SafeAreaView } from "react-native-safe-area-context";
+
 const AddEmployeeContainer = () => {
   const navigation = useNavigation();
+
   const [name, setName] = useState("");
   const [jobTitle, setJobTitle] = useState("");
   const [department, setDepartment] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
 
-  const isFormValid = name && email && department;
+  const [refreshing, setRefreshing] = useState(false);
 
+  const isFormValid = name && email && department;
   const { mutate, isPending } = useAddEmployee();
 
   const handleSaveEmployee = () => {
     if (!isFormValid) {
-      Alert.alert(
-        "Validation Error",
-        "Name, Email, and Department are required"
-      );
+      Alert.alert("Validation Error", "Name, Email, and Department are required");
       return;
     }
 
@@ -39,24 +39,48 @@ const AddEmployeeContainer = () => {
     );
   };
 
+  const onRefresh = useCallback(() => {
+    setRefreshing(true);
+
+    setTimeout(() => {
+      setName("");
+      setJobTitle("");
+      setDepartment("");
+      setPhone("");
+      setEmail("");
+
+      setRefreshing(false);
+    }, 800);
+  }, []);
+
+  const keyboardVerticalOffset = Platform.OS === "ios" ? 80 : 0;
+
   return (
-    <SafeAreaView style={{ flex: 1 }}>
-      <AddEmployeeView
-        name={name}
-        jobTitle={jobTitle}
-        department={department}
-        phone={phone}
-        email={email}
-        setName={setName}
-        setJobTitle={setJobTitle}
-        setDepartment={setDepartment}
-        setPhone={setPhone}
-        setEmail={setEmail}
-        handleSaveEmployee={handleSaveEmployee}
-        isFormValid={isFormValid}
-        isPending={isPending}
-        onBack={() => navigation.goBack()}
-      />
+    <SafeAreaView style={{ flex: 1 ,backgroundColor: "#F6F7F8" }}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === "ios" ? "padding" : "height"}
+        keyboardVerticalOffset={keyboardVerticalOffset}
+      >
+        <AddEmployeeView
+          name={name}
+          jobTitle={jobTitle}
+          department={department}
+          phone={phone}
+          email={email}
+          setName={setName}
+          setJobTitle={setJobTitle}
+          setDepartment={setDepartment}
+          setPhone={setPhone}
+          setEmail={setEmail}
+          handleSaveEmployee={handleSaveEmployee}
+          isFormValid={isFormValid}
+          isPending={isPending}
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          onBack={() => navigation.goBack()}
+        />
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };

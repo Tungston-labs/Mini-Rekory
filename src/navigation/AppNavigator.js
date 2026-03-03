@@ -1,10 +1,10 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HouseSimple, UserList, UsersFour, Gear } from "phosphor-react-native";
-
+import { View } from "react-native";
 import EmployeesStack from "./EmployeesStack";
 import HomeScreen from "../screens/HR/Home";
-import EmployeesScreen from "../screens/HR/EmployeeList";
+import ProfileScreen from "../screens/HR/ProfileScreen"
 import DepartmentStack from "./DepartmentStack";
 
 const Tab = createBottomTabNavigator();
@@ -16,10 +16,12 @@ const AppNavigator = () => {
         headerShown: false,
         tabBarShowLabel: false,
         tabBarStyle: {
-          height: 50,
+          height: 60,
           backgroundColor: "#fff",
           borderTopWidth: 0,
           elevation: 5,
+          justifyContent: "center",
+          alignItems: "center",
         },
       }}
     >
@@ -28,7 +30,9 @@ const AppNavigator = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ focused }) => (
-            <HouseSimple size={26} color={focused ? "#E53935" : "#000"} />
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: "20" }}>
+              <HouseSimple size={26} color={focused ? "#E53935" : "#000"} />
+            </View>
           ),
         }}
       />
@@ -38,7 +42,9 @@ const AppNavigator = () => {
         component={EmployeesStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <UserList size={26} color={focused ? "#E53935" : "#000"} />
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: "20" }}>
+              <UserList size={26} color={focused ? "#E53935" : "#000"} />
+            </View>
           ),
         }}
       />
@@ -48,17 +54,21 @@ const AppNavigator = () => {
         component={DepartmentStack}
         options={{
           tabBarIcon: ({ focused }) => (
-            <UsersFour size={26} color={focused ? "#E53935" : "#000"} />
+            <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: "20" }}>
+              <UsersFour size={26} color={focused ? "#E53935" : "#000"} />
+            </View>
           ),
         }}
       />
 
       <Tab.Screen
         name="Settings"
-        component={EmployeesScreen}
+        component={ProfileScreen}
         options={{
           tabBarIcon: ({ focused }) => (
+                   <View style={{ flex: 1, justifyContent: "center", alignItems: "center", marginTop: "20" }}>
             <Gear size={26} color={focused ? "#E53935" : "#000"} />
+            </View>
           ),
         }}
       />

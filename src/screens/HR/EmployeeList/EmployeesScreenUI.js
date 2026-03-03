@@ -11,6 +11,7 @@ import { MagnifyingGlass, Sliders } from "phosphor-react-native";
 import EmployeeRow from "../../../components/Employee/Employeerow";
 import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
 import styles from "./style";
+import { RefreshControl } from "react-native";
 
 const EmployeesScreenUI = ({
   employees,
@@ -18,6 +19,8 @@ const EmployeesScreenUI = ({
   isError,
   search,
   setSearch,
+    refreshing,    
+  onRefresh,    
   filter,
   setFilter,
   showFilter,
@@ -46,7 +49,7 @@ const EmployeesScreenUI = ({
   }
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1 ,backgroundColor: "#F6F7F8"  }} edges={["top"]}>
       <View style={styles.container}>
         <View style={styles.header}>
           <Text style={styles.title}>All Employees</Text>
@@ -96,21 +99,30 @@ const EmployeesScreenUI = ({
           </View>
         )}
 
-        <ScrollView contentContainerStyle={styles.list}>
-          <View style={styles.listContainerFullWidth}>
-            {employees.map((emp, index) => (
-              <React.Fragment key={emp.id || index}>
-                <EmployeeRow
-                  name={emp.name}
-                  location={emp.location}
-                  status={emp.status}
-                  onPress={() => onEmployeePress(emp)}
-                />
-                {index !== employees.length - 1 && <View style={styles.hr} />}
-              </React.Fragment>
-            ))}
-          </View>
-        </ScrollView>
+       <ScrollView
+  contentContainerStyle={styles.list}
+  refreshControl={
+    <RefreshControl
+      refreshing={refreshing}
+      onRefresh={onRefresh}
+    />
+  }
+>
+  <View style={styles.listContainerFullWidth}>
+    {employees.map((emp, index) => (
+      <React.Fragment key={emp.id || index}>
+        <EmployeeRow
+          name={emp.name}
+          location={emp.location}
+          status={emp.status}
+          onPress={() => onEmployeePress(emp)}
+        />
+        {index !== employees.length - 1 && <View style={styles.hr} />}
+      </React.Fragment>
+    ))}
+  </View>
+</ScrollView>
+
 
         <TouchableOpacity style={styles.fab} onPress={onAddEmployee}>
           <Text style={styles.fabIcon}>＋</Text>

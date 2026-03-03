@@ -71,7 +71,7 @@ const EmployeeDetailsContainer = () => {
       employee={emp}
       locations={locations}
       onBack={() => navigation.goBack()}
-      onRefresh={onRefresh}      // pass refresh function
+      onRefresh={onRefresh}     
       refreshing={refreshing}    
     />
   );

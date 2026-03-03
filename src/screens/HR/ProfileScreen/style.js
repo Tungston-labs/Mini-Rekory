@@ -94,22 +94,20 @@ role: {
   },
 
   logoutButton: {
-  marginTop: 20,
-  marginHorizontal: 16,
-  paddingVertical: 14,
-  borderRadius: 12,
-  backgroundColor: "#fff",
-  alignItems: "center",
-  justifyContent: "center",
-  flexDirection: "row",   
-},
+    marginTop: 20,
+    marginHorizontal: 16,
+    paddingVertical: 14,
+    borderRadius: 12,
+    backgroundColor: "#C61217",
+    alignItems: "center",
+    elevation: 2,
+  },
 
-logoutText: {
-  color: "#C61217",
-  fontWeight: "600",
-  fontSize: 16,
-  marginLeft: 8,  
-},
+  logoutText: {
+    color: "white",
+    fontWeight: "600",
+    fontSize: 16,
+  },
   PolicyButton:{
     marginTop: 12,
     marginHorizontal: 16,

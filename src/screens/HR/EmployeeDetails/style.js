@@ -13,6 +13,7 @@ export default StyleSheet.create({
     },
     container: {
         flex: 1,
+             backgroundColor: "#F6F7F8",
     },
     scroll: {
         flex: 1,
@@ -27,7 +28,7 @@ export default StyleSheet.create({
         alignItems: "center",
         borderWidth: 1,
         borderColor: "rgba(0, 0, 0, 0.1)",
-       backgroundColor:"white"
+        backgroundColor: "white"
     },
 
 
@@ -70,7 +71,7 @@ export default StyleSheet.create({
     },
 
     label: {
-        width: 90,              
+        width: 90,
         fontSize: 14,
         color: "#414141",
         fontFamily: "Poppins",
@@ -121,13 +122,13 @@ export default StyleSheet.create({
         flexDirection: "row",
         justifyContent: "space-between",
         marginBottom: 20,
-        
+
     },
 
     sectionTitle: {
         fontSize: 16,
         fontWeight: "700",
-         fontFamily: "PoppinSemiBold",   
+        fontFamily: "PoppinSemiBold",
         marginTop: 20,
     },
 
@@ -163,7 +164,7 @@ export default StyleSheet.create({
         borderWidth: 2,
         borderColor: "#000",
         backgroundColor: "#fff",
-        alignItems: "center",    
+        alignItems: "center",
         justifyContent: "center",
     },
 
@@ -188,14 +189,14 @@ export default StyleSheet.create({
 
     place: {
         fontSize: 14,
-      fontFamily: "PoppinsRegular",      
+        fontFamily: "PoppinsRegular",
 
 
     },
 
     time: {
         fontSize: 12,
-        fontFamily: "PoppinsRegular",   
+        fontFamily: "PoppinsRegular",
 
 
 
@@ -215,4 +216,12 @@ export default StyleSheet.create({
         color: "#fff",
         fontWeight: "400",
     },
+
+    noLocationWrapper: {
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        height:120
+    }
+
 });

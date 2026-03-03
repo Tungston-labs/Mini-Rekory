@@ -53,10 +53,10 @@ export const useEmployeeLocations = (id) =>
         { place: "MG Road, Kochi", time: "Today, 04:30 pm", current: true },
         { place: "Palarivattom", time: "Today, 04:00 pm" },
         { place: "Tripunithura", time: "Today, 03:00 pm" },
-         { place: "Palarivattom", time: "Today, 04:00 pm" },
+        { place: "Palarivattom", time: "Today, 04:00 pm" },
         { place: "Tripunithura", time: "Today, 03:00 pm" },
-           { place: "Tripunithura", time: "Today, 03:00 pm" },
-         { place: "Palarivattom", time: "Today, 04:00 pm" },
+        { place: "Tripunithura", time: "Today, 03:00 pm" },
+        { place: "Palarivattom", time: "Today, 04:00 pm" },
         { place: "Tripunithura", time: "Today, 03:00 pm" },
       ];
       return locations;

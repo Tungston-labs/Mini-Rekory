@@ -1,10 +1,11 @@
-// EmployeeNavigator.js
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HouseSimple, UserList, Gear } from "phosphor-react-native";
-import EmployeeHome from "../screens/Employee/EmployeeHome";
-import EmployeeProfile from "../screens/Employee/EmployeeProfile";
-import EmployeeSettings from "../screens/Employee/EmployeeTimesheet";
+import { StyleSheet } from "react-native";
+import { HouseSimple, CalendarDots, User } from "phosphor-react-native";
+
+import EmployeeHome from "../screens/Employee/EmployeeHome/EmployeeHomecontainer";
+import EmployeeProfile from "../screens/Employee/EmployeeTimesheet";
+import EmployeeSettings from "../screens/Employee/EmployeeProfile";
 
 const Tab = createBottomTabNavigator();
 
@@ -14,49 +15,49 @@ const EmployeeNavigator = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarStyle: {
-          height: 50,
-          backgroundColor: red,
-          borderTopWidth: 0,
-          elevation: 5,
+        tabBarStyle: styles.tabBar,
+        tabBarItemStyle: styles.tabItem,
+        tabBarIconStyle: {
+          marginTop: 10,
         },
       }}
     >
       <Tab.Screen
-        name="EmployeeHome"
+        name="Home"
         component={EmployeeHome}
         options={{
           tabBarIcon: ({ focused }) => (
             <HouseSimple
-              size={26}
-              weight={focused ? "regular" : "regular"}
-              color={focused ? "#E53935" : "#000"}
+              size={26} color={focused ? "#000" : "#fff"}
+              weight="regular"
+
             />
           ),
         }}
       />
+
       <Tab.Screen
-        name="Tasks"
-        component={EmployeeProfile} 
+        name="Calendar"
+        component={EmployeeProfile}
         options={{
           tabBarIcon: ({ focused }) => (
-            <UserList
-              size={26}
-              weight={focused ? "regular" : "regular"}
-              color={focused ? "#E53935" : "#000"}
+            <CalendarDots
+              size={26} color={focused ? "#000" : "#fff"}
+              weight="regular"
+
             />
           ),
         }}
       />
+
       <Tab.Screen
-        name="Settings"
+        name="Profile"
         component={EmployeeSettings}
         options={{
           tabBarIcon: ({ focused }) => (
-            <Gear
-              size={26}
-              weight={focused ? "regular" : "regular"}
-              color={focused ? "#E53935" : "#000"}
+            <User
+              size={26} color={focused ? "#000" : "#fff"}
+              weight="regular"
             />
           ),
         }}
@@ -66,3 +67,26 @@ const EmployeeNavigator = () => {
 };
 
 export default EmployeeNavigator;
+
+const styles = StyleSheet.create({
+  tabBar: {
+    position: "absolute",
+    bottom: 10,
+    left: 20,
+    right: 20,
+    backgroundColor: "#C61217",
+    borderRadius: 50,
+    height: 60,
+    borderTopWidth: 0,
+    // elevation: 10,
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginHorizontal: 15,
+  },
+
+  tabItem: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

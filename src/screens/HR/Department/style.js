@@ -7,7 +7,6 @@ export default StyleSheet.create({
         position: "relative",
     },
 
-    /* Header */
     header: {
         backgroundColor: "#F6F7F8",
         paddingHorizontal: 16,

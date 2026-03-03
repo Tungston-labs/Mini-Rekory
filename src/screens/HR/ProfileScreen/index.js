@@ -4,11 +4,9 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
 import InfoCard from "../../../components/Profile";
 import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
-import { SignOutIcon } from "phosphor-react-native";
 import { RefreshControl } from "react-native";
-import { useAuth } from "../../../context/AuthContext";
-const EmployeeProfile = () => {
-  const { setUserRole, setUsername } = useAuth();
+
+const ProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 const [refreshing, setRefreshing] = useState(false);
@@ -66,7 +64,6 @@ const onRefresh = () => {
         <Text style={styles.role}>UIUX Designer</Text>
       </View>
 
-
       <InfoCard title="Work Information">
         <View style={styles.infoRow}>
           <Text style={styles.label}>Full Name</Text>
@@ -98,24 +95,12 @@ const onRefresh = () => {
         <Text style={styles.PolicyText}>Privacy Policy</Text>
       </TouchableOpacity>
 
-    <TouchableOpacity
-  style={styles.logoutButton}
-  onPress={() => {
-    // Clear the user role to trigger navigation to login
-    setUserRole(null);
-    setUsername("");
-    
-    // Optional: clear any stored tokens if using AsyncStorage
-    // await AsyncStorage.removeItem("accessToken");
-    // await AsyncStorage.removeItem("refreshToken");
-  }}
->
-  <SignOutIcon size={20} color="#C61217" />
-  <Text style={styles.logoutText}>Log Out</Text>
-</TouchableOpacity>
+      <TouchableOpacity style={styles.logoutButton}>
+        <Text style={styles.logoutText}>Log Out</Text>
+      </TouchableOpacity>
     </ScrollView>
     </SafeAreaView>
   );
 };
 
-export default EmployeeProfile;
+export default ProfileScreen;

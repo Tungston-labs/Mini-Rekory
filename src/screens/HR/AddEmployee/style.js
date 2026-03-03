@@ -5,6 +5,10 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#F6F7F8",
   },
+   screen: {
+        flex: 1,
+        backgroundColor: "#F6F7F8",
+    },
 
 
   header: {
@@ -76,12 +80,11 @@ export default StyleSheet.create({
   label: {
     fontSize: 13,
     color: "#000",
-    // marginBottom: 6,
-    marginTop: 14,
+    marginTop: 10,
     fontFamily: "PoppinsRegular",
   },
   input: {
-    height: 38,
+    height: 45,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 8,

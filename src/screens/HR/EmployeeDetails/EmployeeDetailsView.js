@@ -17,9 +17,8 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
   if (!employee) return null;
 
   return (
-    <SafeAreaView style={{ flex: 1 }} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1,backgroundColor: "#F6F7F8",}} edges={["top"]}>
       <View style={styles.container}>
-        {/* Profile Card */}
         <View style={styles.profileCard}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn}>
             <CaretLeft size={24} />
@@ -42,12 +41,9 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
             <PhoneCall size={18} color="#fff" />
           </TouchableOpacity>
         </View>
-
-        {/* Location Card */}
         <View style={styles.locationCard}>
           <View style={styles.locationHeader}>
             <Text style={styles.sectionTitle}>Recent Locations</Text>
-
             <View style={styles.dateRow}>
               <TouchableOpacity
                 style={{ flexDirection: "row", alignItems: "center", gap: 6 }}
@@ -71,40 +67,51 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
             )}
           </View>
 
-          {locations.length === 0 ? (
-            <View style={styles.noLocationWrapper}>
-              <MapPin size={32} color="#B0B0B0" />
-              <Text style={styles.noLocationText}>No location data available</Text>
-            </View>
-          ) : (
-            <ScrollView showsVerticalScrollIndicator={false} 
-            contentContainerStyle={{ paddingBottom: 40 }}
-              refreshControl={
-                <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-              }
-            >
-              {locations.map((item, index) => (
-                <View key={index} style={styles.locationRow}>
-                  <View style={styles.timeline}>
-                    <View style={[styles.dot, item.current && styles.activeDot]}>
-                      <MapPin size={20} color={item.current ? "#2ECC71" : "#000"} />
-                    </View>
-                    {index !== locations.length - 1 && <View style={styles.dashedLine} />}
-                  </View>
+       <ScrollView
+  showsVerticalScrollIndicator={false}
+  contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+  refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  }
+>
+  {locations.length === 0 ? (
+    <View style={styles.noLocationWrapper}>
+      <MapPin size={32} color="#B0B0B0" />
+      <Text style={styles.noLocationText}>
+        No location data available
+      </Text>
+    </View>
+  ) : (
+    locations.map((item, index) => (
+      <View key={index} style={styles.locationRow}>
+        <View style={styles.timeline}>
+          <View style={[styles.dot, item.current && styles.activeDot]}>
+            <MapPin
+              size={20}
+              color={item.current ? "#2ECC71" : "#000"}
+            />
+          </View>
 
-                  <View style={styles.locationInfo}>
-                    <Text style={styles.place}>{item.place}</Text>
-                    <Text style={styles.time}>{item.time}</Text>
-                    {item.current && (
-                      <View style={styles.currentBadge}>
-                        <Text style={styles.currentText}>CURRENT</Text>
-                      </View>
-                    )}
-                  </View>
-                </View>
-              ))}
-            </ScrollView>
+          {index !== locations.length - 1 && (
+            <View style={styles.dashedLine} />
           )}
+        </View>
+
+        <View style={styles.locationInfo}>
+          <Text style={styles.place}>{item.place}</Text>
+          <Text style={styles.time}>{item.time}</Text>
+
+          {item.current && (
+            <View style={styles.currentBadge}>
+              <Text style={styles.currentText}>CURRENT</Text>
+            </View>
+          )}
+        </View>
+      </View>
+    ))
+  )}
+</ScrollView>
+
         </View>
       </View>
     </SafeAreaView>

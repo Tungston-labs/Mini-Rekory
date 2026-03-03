@@ -33,6 +33,8 @@ const DepartmentsScreenUI = ({
   setShowModal,
   onAddDepartment,
   isAdding,
+  refreshing,
+  onRefresh,
 }) => {
   console.log({ showModal })
   if (isLoading) {
@@ -77,6 +79,8 @@ const DepartmentsScreenUI = ({
         ItemSeparatorComponent={() => <View style={styles.separator} />}
         contentContainerStyle={styles.listContent}
         showsVerticalScrollIndicator={false}
+        refreshing={refreshing}
+        onRefresh={onRefresh}
       />
 
       <TouchableOpacity

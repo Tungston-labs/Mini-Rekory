@@ -11,12 +11,11 @@ import styles from "./style";
 
 const DepartmentModal = ({ visible, onClose, onCreate, loading }) => {
   const [name, setName] = useState("");
-  const [code, setCode] = useState("");
 
   useEffect(() => {
     if (!visible) {
       setName("");
-      setCode("");
+
     }
   }, [visible]);
 
@@ -25,11 +24,11 @@ const DepartmentModal = ({ visible, onClose, onCreate, loading }) => {
 
     onCreate({
       name: name.trim(),
-      code: code.trim().toUpperCase(),
+
     });
   };
 
-  const isValid = name.trim() && code.trim();
+  const isValid = name.trim();
 
   return (
     <Modal
@@ -57,16 +56,7 @@ const DepartmentModal = ({ visible, onClose, onCreate, loading }) => {
             style={styles.input}
           />
 
-          <Text style={styles.label}>Department Code*</Text>
-          <TextInput
-            placeholder="Ex: DEV, HR, FIN"
-            placeholderTextColor="#BDBDBD"
-            value={code}
-            onChangeText={setCode}
-            autoCapitalize="characters"
-            style={styles.input}
-          />
-
+         
           <View style={styles.actions}>
             <TouchableOpacity
               style={[
