@@ -1,35 +1,66 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [userRole, setUserRole] = useState(null); // HR / EMPLOYEE
-  const [username, setUsername] = useState(""); // store logged-in username (optional)
 
-  // Derived state: user is logged in if userRole exists
+  const [userRole, setUserRole] = useState(null);
+  const [username, setUsername] = useState("");
+  const [loading, setLoading] = useState(true);
+
   const isLoggedIn = !!userRole;
 
-  const login = (role, name) => {
+  // 🔹 Restore login when app starts
+  useEffect(() => {
+    const loadUser = async () => {
+      try {
+        const role = await AsyncStorage.getItem("userRole");
+        const email = await AsyncStorage.getItem("userEmail");
+
+        if (role) {
+          setUserRole(role);
+          setUsername(email);
+        }
+      } catch (error) {
+        console.log("Auth restore error:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadUser();
+  }, []);
+
+  // 🔹 Login function
+  const login = async (role, email) => {
     setUserRole(role);
-    setUsername(name);
+    setUsername(email);
+
+    await AsyncStorage.setItem("userRole", role);
+    await AsyncStorage.setItem("userEmail", email);
   };
 
-  const logout = () => {
+  // 🔹 Logout function
+  const logout = async () => {
     setUserRole(null);
     setUsername("");
-    // Optional: clear AsyncStorage tokens here if used
+
+    await AsyncStorage.removeItem("accessToken");
+    await AsyncStorage.removeItem("refreshToken");
+    await AsyncStorage.removeItem("userRole");
+    await AsyncStorage.removeItem("userEmail");
   };
 
   return (
     <AuthContext.Provider
       value={{
         userRole,
-        setUserRole,
         username,
-        setUsername,
         isLoggedIn,
         login,
         logout,
+        loading,
       }}
     >
       {children}

@@ -7,32 +7,19 @@ import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
 import { SignOutIcon } from "phosphor-react-native";
 import { RefreshControl } from "react-native";
 import { useAuth } from "../../../context/AuthContext";
+import  useEmployeeProfile  from "../../../hooks/employee/useEmployeeProfile";
+
 const EmployeeProfile = () => {
-  const { setUserRole, setUsername } = useAuth();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isError, setIsError] = useState(false);
-const [refreshing, setRefreshing] = useState(false);
+const { logout } = useAuth();
+  const { profile, loading, error, refetch } = useEmployeeProfile();
+  const [refreshing, setRefreshing] = useState(false);
 
-const onRefresh = () => {
-  setRefreshing(true);
-  setIsLoading(true);
+  const onRefresh = () => {
+    setRefreshing(true);
+    refetch().finally(() => setRefreshing(false));
+  };
 
-  setTimeout(() => {
-    setIsLoading(false);
-    setRefreshing(false);
-  }, 1500);
-};
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-      setIsError(false); 
-    }, 1500);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  if (isLoading) {
+  if (loading) {
     return (
       <SafeAreaView style={{ flex: 1, padding: 16 }}>
         {[...Array(6)].map((_, i) => (
@@ -42,7 +29,7 @@ const onRefresh = () => {
     );
   }
 
-  if (isError) {
+  if (error || !profile) {
     return (
       <SafeAreaView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
@@ -53,67 +40,69 @@ const onRefresh = () => {
   }
 
   return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }}>
-    <ScrollView contentContainerStyle={styles.container}>
-      <View style={styles.header} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+        }
+      >
+        <View style={styles.header} />
 
-      <View style={styles.profileWrapper}>
-        <Image
-          source={{ uri: "https://i.pravatar.cc/300" }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>Arjun S</Text>
-        <Text style={styles.role}>UIUX Designer</Text>
-      </View>
-
-
-      <InfoCard title="Work Information">
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.value}>Arjun S</Text>
+        <View style={styles.profileWrapper}>
+          <Image
+            source={{ uri: profile.profile_pic }}
+            style={styles.profileImage}
+          />
+          <Text style={styles.name}>{profile.name}</Text>
+          <Text style={styles.role}>{profile.job_title}</Text>
         </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Job Title</Text>
-          <Text style={styles.value}>UIUX Designer</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Department</Text>
-          <Text style={styles.value}>Design</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>arjuns@gmail.com</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Phone</Text>
-          <Text style={styles.value}>9521322200</Text>
-        </View>
-      </InfoCard>
 
-      <TouchableOpacity style={styles.TermsButton}>
-        <Text style={styles.PolicyText}>Terms & Conditions</Text>
-      </TouchableOpacity>
+        <InfoCard title="Work Information">
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Full Name</Text>
+             <Text style={styles.colon}>:</Text>
+            <Text style={styles.value}>{profile.name || "--------"
+              }</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Job Title</Text>
+             <Text style={styles.colon}>:</Text>
+            <Text style={styles.value}>{profile.job_title  || "--------"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Department</Text>
+             <Text style={styles.colon}>:</Text>
+            <Text style={styles.value}>{profile.department || "--------"}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email</Text>
+             <Text style={styles.colon}>:</Text>
+            <Text style={styles.value}>{profile.email}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Phone</Text>
+             <Text style={styles.colon}>:</Text>
+            <Text style={styles.value}>{profile.phone}</Text>
+          </View>
+        </InfoCard>
 
-      <TouchableOpacity style={styles.PolicyButton}>
-        <Text style={styles.PolicyText}>Privacy Policy</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.TermsButton}>
+          <Text style={styles.PolicyText}>Terms & Conditions</Text>
+        </TouchableOpacity>
 
-    <TouchableOpacity
+        <TouchableOpacity style={styles.PolicyButton}>
+          <Text style={styles.PolicyText}>Privacy Policy</Text>
+        </TouchableOpacity>
+
+       <TouchableOpacity
   style={styles.logoutButton}
-  onPress={() => {
-    // Clear the user role to trigger navigation to login
-    setUserRole(null);
-    setUsername("");
-    
-    // Optional: clear any stored tokens if using AsyncStorage
-    // await AsyncStorage.removeItem("accessToken");
-    // await AsyncStorage.removeItem("refreshToken");
-  }}
+  onPress={logout}
 >
   <SignOutIcon size={20} color="#C61217" />
   <Text style={styles.logoutText}>Log Out</Text>
 </TouchableOpacity>
-    </ScrollView>
+      </ScrollView>
     </SafeAreaView>
   );
 };

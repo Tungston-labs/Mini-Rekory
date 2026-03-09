@@ -5,12 +5,15 @@ import styles from "./style";
 import InfoCard from "../../../components/Profile";
 import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
 import { RefreshControl } from "react-native";
-
+import { useAuth } from "../../../context/AuthContext";
 const ProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
 const [refreshing, setRefreshing] = useState(false);
-
+const { logout } = useAuth();
+ const handleLogout = async () => {
+  await logout();
+};
 const onRefresh = () => {
   setRefreshing(true);
   setIsLoading(true);
@@ -52,7 +55,12 @@ const onRefresh = () => {
 
   return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }}>
-    <ScrollView contentContainerStyle={styles.container}>
+   <ScrollView
+          contentContainerStyle={styles.container}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          >
       <View style={styles.header} />
 
       <View style={styles.profileWrapper}>
@@ -94,10 +102,12 @@ const onRefresh = () => {
       <TouchableOpacity style={styles.PolicyButton}>
         <Text style={styles.PolicyText}>Privacy Policy</Text>
       </TouchableOpacity>
-
-      <TouchableOpacity style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Log Out</Text>
-      </TouchableOpacity>
+<TouchableOpacity
+  style={styles.logoutButton}
+  onPress={handleLogout}
+>
+  <Text style={styles.logoutText}>Log Out</Text>
+</TouchableOpacity>
     </ScrollView>
     </SafeAreaView>
   );

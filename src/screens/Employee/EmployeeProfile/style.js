@@ -29,7 +29,7 @@ profileImage: {
 
 name: {
   marginTop: 10,
-  fontSize: 20,
+  fontSize: 18,
   fontWeight: "bold",
   color: "#000",
 },
@@ -77,21 +77,30 @@ role: {
     color: "#777",
   },
 
-  infoRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
+ infoRow: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 12,
+},
 
-  label: {
-    fontSize: 14,
-    color: "#666",
-  },
+label: {
+  width: 120, 
+  fontSize: 14,
+  color: "#666",
+},
 
-  value: {
-    fontSize: 14,
-    fontWeight: "500",
-  },
+colon: {
+  width: 20,
+  fontSize: 12,
+  color: "#666",
+},
+
+value: {
+  flex: 1,
+  fontSize: 14,
+  fontWeight: "500",
+  color: "#000",
+},
 
   logoutButton: {
   marginTop: 20,

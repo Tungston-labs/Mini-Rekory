@@ -22,35 +22,36 @@ export default StyleSheet.create({
 
     profileCard: {
         borderRadius: 16,
-        padding: 16,
-        margin: 10,
+        padding: 10,
+        margin: 15,
         flexDirection: "row",
-        alignItems: "center",
+        // alignItems: "center",
         borderWidth: 1,
         borderColor: "rgba(0, 0, 0, 0.1)",
-        backgroundColor: "white"
+        backgroundColor: "white",
+    
     },
 
 
     backBtn: {
         width: 32,
         height: 32,
-        alignItems: "center",
-        justifyContent: "center",
-        marginRight: 8,
+        // alignItems: "center",
+        // justifyContent: "center",
+        // marginRight: 8,
     },
 
     userRow: {
         flex: 1,
         flexDirection: "row",
-        alignItems: "center",
+        // alignItems: "center",
     },
 
     avatar: {
-        width: 48,
-        height: 48,
+        width: 40,
+        height: 40,
         borderRadius: 24,
-        marginRight: 12,
+        marginRight: 10,
     },
 
     profileInfo: {
@@ -59,9 +60,9 @@ export default StyleSheet.create({
     },
 
     name: {
-        fontSize: 16,
+        fontSize: 14,
         fontWeight: "600",
-        marginBottom: 6,
+        marginBottom: 4,
     },
 
     infoRow: {
@@ -71,8 +72,8 @@ export default StyleSheet.create({
     },
 
     label: {
-        width: 90,
-        fontSize: 14,
+        width: 80,
+        fontSize: 12,
         color: "#414141",
         fontFamily: "Poppins",
         fontWeight: "400",
@@ -86,7 +87,7 @@ export default StyleSheet.create({
 
     value: {
         flex: 1,
-        fontSize: 14,
+        fontSize: 13,
         color: "#414141",
         fontFamily: "Poppins",
         fontWeight: "400",

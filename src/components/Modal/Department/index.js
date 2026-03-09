@@ -15,16 +15,13 @@ const DepartmentModal = ({ visible, onClose, onCreate, loading }) => {
   useEffect(() => {
     if (!visible) {
       setName("");
-
     }
   }, [visible]);
 
   const handleCreate = () => {
-    if (!name.trim() || !code.trim()) return;
-
+    if (!name.trim()) return; 
     onCreate({
       name: name.trim(),
-
     });
   };
 
@@ -37,50 +34,48 @@ const DepartmentModal = ({ visible, onClose, onCreate, loading }) => {
       animationType="slide"
       statusBarTranslucent
     >
-   
-       <View style={{ flex: 1, justifyContent: "flex-end" }}>
-      <Pressable style={styles.overlay} onPress={onClose} />
+      <View style={{ flex: 1, justifyContent: "flex-end" }}>
+        <Pressable style={styles.overlay} onPress={onClose} />
 
-      <View style={styles.sheet}>
-        <View style={styles.header}>
-          <Text style={styles.headerText}>Create New Department</Text>
-        </View>
+        <View style={styles.sheet}>
+          <View style={styles.header}>
+            <Text style={styles.headerText}>Create New Department</Text>
+          </View>
 
-        <View style={styles.content}>
-          <Text style={styles.label}>Department Name*</Text>
-          <TextInput
-            placeholder="Enter Department Name"
-            placeholderTextColor="#BDBDBD"
-            value={name}
-            onChangeText={setName}
-            style={styles.input}
-          />
+          <View style={styles.content}>
+            <Text style={styles.label}>Department Name*</Text>
+            <TextInput
+              placeholder="Enter Department Name"
+              placeholderTextColor="#BDBDBD"
+              value={name}
+              onChangeText={setName}
+              style={styles.input}
+            />
 
-         
-          <View style={styles.actions}>
-            <TouchableOpacity
-              style={[
-                styles.createBtn,
-                (!isValid || loading) && { opacity: 0.6 },
-              ]}
-              onPress={handleCreate}
-              disabled={!isValid || loading}
-            >
-              <Text style={styles.createText}>
-                {loading ? "Creating..." : "Create"}
-              </Text>
-            </TouchableOpacity>
+            <View style={styles.actions}>
+              <TouchableOpacity
+                style={[
+                  styles.createBtn,
+                  (!isValid || loading) && { opacity: 0.6 },
+                ]}
+                onPress={handleCreate}
+                disabled={!isValid || loading}
+              >
+                <Text style={styles.createText}>
+                  {loading ? "Creating..." : "Create"}
+                </Text>
+              </TouchableOpacity>
 
-            <TouchableOpacity
-              style={styles.cancelBtn}
-              onPress={onClose}
-              disabled={loading}
-            >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.cancelBtn}
+                onPress={onClose}
+                disabled={loading}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
       </View>
     </Modal>
   );

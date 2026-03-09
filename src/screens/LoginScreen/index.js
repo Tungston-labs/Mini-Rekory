@@ -1,84 +1,3 @@
-// import React, { useState } from "react";
-// import { View, Text, TextInput, TouchableOpacity, Alert } from "react-native";
-// import { useAuth } from "../../context/AuthContext";
-
-// const LoginScreen = () => {
-//   const { setUserRole, setUsername } = useAuth();
-//   const [usernameInput, setUsernameInput] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   const handleLogin = () => {
-//     if (!usernameInput || !password) {
-//       Alert.alert("Validation Error", "Username and password are required");
-//       return;
-//     }
-
-
-//     let role = null;
-//     if (usernameInput.toLowerCase() === "hr" && password === "1234") role = "HR";
-//     else if (usernameInput.toLowerCase() === "employee" && password === "1234") role = "EMPLOYEE";
-
-//     if (!role) {
-//       Alert.alert("Login Failed", "Invalid username or password");
-//       return;
-//     }
-
-//     setUserRole(role);
-//     setUsername(usernameInput);
-//     Alert.alert("Success", `Logged in as ${role}`);
-//   };
-
-//   return (
-//     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 20 }}>
-//       <TextInput
-//         placeholder="Username"
-//         value={usernameInput}
-//         onChangeText={setUsernameInput}
-//         style={{
-//           width: "100%",
-//           borderWidth: 1,
-//           borderColor: "#ccc",
-//           borderRadius: 8,
-//           padding: 12,
-//           marginBottom: 12,
-//         }}
-//       />
-
-//       <TextInput
-//         placeholder="Password"
-//         value={password}
-//         onChangeText={setPassword}
-//         secureTextEntry
-//         style={{
-//           width: "100%",
-//           borderWidth: 1,
-//           borderColor: "#ccc",
-//           borderRadius: 8,
-//           padding: 12,
-//           marginBottom: 20,
-//         }}
-//       />
-
-//       <TouchableOpacity
-//         onPress={handleLogin}
-//         style={{
-//           width: "100%",
-//           backgroundColor: "#C61217",
-//           padding: 15,
-//           borderRadius: 8,
-//           alignItems: "center",
-//         }}
-//       >
-//         <Text style={{ color: "#fff", fontSize: 16 }}>Login</Text>
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
-
-// export default LoginScreen;
-
-
-
 import React, { useState } from "react";
 import {
   View,
@@ -86,7 +5,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
-    KeyboardAvoidingView,
+  KeyboardAvoidingView,
   Platform,
   ScrollView,
   Alert
@@ -94,35 +13,51 @@ import {
 import { Eye, EyeSlash } from "phosphor-react-native";
 import styles from "./style";
 import { useAuth } from "../../context/AuthContext";
-const LoginScreen = () => {
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import api from "../../services/api"; 
+import { useNavigation } from "@react-navigation/native";
+
+const LoginScreen = ( ) => {
+  const navigation = useNavigation();
   const [secure, setSecure] = useState(true);
-   const { setUserRole, setUsername } = useAuth();
+  const { setUserRole, setUsername } = useAuth();
   const [usernameInput, setUsernameInput] = useState("");
   const [password, setPassword] = useState("");
+const { login } = useAuth();
+const handleLogin = async () => {
+  if (!usernameInput || !password) {
+    Alert.alert("Validation Error", "Username and password are required");
+    return;
+  }
 
-  const handleLogin = () => {
-    if (!usernameInput || !password) {
-      Alert.alert("Validation Error", "Username and password are required");
-      return;
-    }
+  try {
+console.log("Typed Email:", usernameInput);
+console.log("Typed Password:", password);
 
+const res = await api.post("/auth/login/", {
+  email: usernameInput,
+  password: password,
+});
 
-    let role = null;
-    if (usernameInput.toLowerCase() === "hr" && password === "1234") role = "HR";
-    else if (usernameInput.toLowerCase() === "employee" && password === "1234") role = "EMPLOYEE";
+    console.log("LOGIN RESPONSE:", res.data);
 
-    if (!role) {
-      Alert.alert("Login Failed", "Invalid username or password");
-      return;
-    }
+    await AsyncStorage.setItem("accessToken", res.data.access);
+    await AsyncStorage.setItem("refreshToken", res.data.refresh);
 
-    setUserRole(role);
-    setUsername(usernameInput);
+    console.log("Token saved successfully");
+    const role = res.data.user.role;
+    login(res.data.user.role, res.data.user.email);
+
     Alert.alert("Success", `Logged in as ${role}`);
-  };
+
+  } catch (error) {
+    console.log("LOGIN ERROR:", error.response?.data || error.message);
+    Alert.alert("Login Failed", "Invalid email or password");
+  }
+};
 
   return (
-   <KeyboardAvoidingView
+    <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
@@ -147,13 +82,13 @@ const LoginScreen = () => {
           />
 
           {/* Username */}
-          <Text style={styles.label}>User Name</Text>
+          <Text style={styles.label}>Email</Text>
           <TextInput
-            placeholder="Enter user name"
+            placeholder="Enter Email Id"
             placeholderTextColor="#A0A0A0"
             style={styles.input}
             value={usernameInput}
-        onChangeText={setUsernameInput}
+            onChangeText={setUsernameInput}
           />
 
           {/* Password */}
@@ -164,8 +99,8 @@ const LoginScreen = () => {
               placeholderTextColor="#A0A0A0"
               secureTextEntry={secure}
               style={styles.passwordInput}
-                value={password}
-        onChangeText={setPassword}
+              value={password}
+              onChangeText={setPassword}
             />
             <TouchableOpacity onPress={() => setSecure(!secure)}>
               {secure ? (
@@ -182,15 +117,15 @@ const LoginScreen = () => {
               <View style={styles.checkbox} />
               <Text style={styles.rememberText}>Keep me signed in</Text>
             </View>
-            <TouchableOpacity>
-              <Text style={styles.forgot}>Forgot password</Text>
-            </TouchableOpacity>
+   <TouchableOpacity onPress={() => navigation.navigate("Forget")}>
+  <Text style={styles.forgot}>Forgot password</Text>
+</TouchableOpacity>
           </View>
 
           {/* Login Button */}
-          <TouchableOpacity 
-               onPress={handleLogin}
-          style={styles.button}>
+          <TouchableOpacity
+            onPress={handleLogin}
+            style={styles.button}>
             <Text style={styles.buttonText}>Login</Text>
           </TouchableOpacity>
         </View>

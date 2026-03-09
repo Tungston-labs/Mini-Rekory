@@ -3,13 +3,14 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { HouseSimple, UserList, UsersFour, Gear } from "phosphor-react-native";
 import { View } from "react-native";
 import EmployeesStack from "./EmployeesStack";
-import HomeScreen from "../screens/HR/Home";
+import HomeScreen from "../screens/HR/HomeScreen";
 import ProfileScreen from "../screens/HR/ProfileScreen"
 import DepartmentStack from "./DepartmentStack";
 
 const Tab = createBottomTabNavigator();
 
 const AppNavigator = () => {
+  console.log("APP NAVIGATOR RENDERED");
   return (
     <Tab.Navigator
       screenOptions={{

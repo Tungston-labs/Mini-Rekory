@@ -1,7 +1,8 @@
 import React, { useState, useCallback } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { useDepartments, useAddDepartment } from "../../../hooks/useDepartments";
+import { useDepartments, useAddDepartment } from "../../../hooks/hr/useDepartments";
 import DepartmentsScreenUI from "./DepartmentsScreenUI";
+import Toast from 'react-native-toast-message';
 
 const DepartmentsScreen = () => {
   const navigation = useNavigation();
@@ -9,27 +10,56 @@ const DepartmentsScreen = () => {
   const [refreshing, setRefreshing] = useState(false);
 
   const {
-    data: departments = [],
+    data,
     isLoading,
     isError,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
     refetch, 
   } = useDepartments();
 
-  const { mutate: addDepartment, isPending } = useAddDepartment();
+const { mutate: addDepartment, isLoading: isAdding } = useAddDepartment();
 
 const handleAddDepartment = (payload) => {
   addDepartment(payload, {
-    onSuccess: async () => {
+    onSuccess: () => {
       setShowModal(false);
-      await refetch(); 
+
+      Toast.show({
+        type: 'success',
+        text1: `${payload.name} added successfully`,
+        position: 'top',      
+        visibilityTime: 2000,
+        topOffset: 50,         
+        props: { style: { right: 10 } }, 
+      });
     },
+    onError: (error) => {
+      Toast.show({
+        type: 'error',
+        text1: `Failed to add ${payload.name}`,
+        position: 'top',
+        visibilityTime: 2000,
+        topOffset: 50,
+      });
+    }
   });
 };
-  const onRefresh = useCallback(async () => {
+
+const departments = data ? data.pages.flatMap(page => page.results) : [];
+
+ const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
   }, [refetch]);
+
+  const loadMore = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
   return (
     <DepartmentsScreenUI
@@ -39,9 +69,11 @@ const handleAddDepartment = (payload) => {
       showModal={showModal}
       setShowModal={setShowModal}
       onAddDepartment={handleAddDepartment}
-      isAdding={isPending}
+      isAdding={isAdding}
       refreshing={refreshing}   
-      onRefresh={onRefresh}        
+      onRefresh={onRefresh}   
+      onEndReached={loadMore}
+      isFetchingNextPage={isFetchingNextPage}     
     />
   );
 };

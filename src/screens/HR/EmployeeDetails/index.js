@@ -1,20 +1,42 @@
-import React,{useState , useCallback} from "react";
+import React, { useState, useCallback } from "react";
 import { Text } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { SafeAreaView } from "react-native-safe-area-context";
+import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
+import EmployeeDetailsView from "./EmployeeDetailsView";
 import {
   useEmployeeDetails,
   useEmployeeLocations,
-} from "../../../hooks/useEmployees";
-import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
-import EmployeeDetailsView from "./EmployeeDetailsView";
+} from "../../../hooks/hr/useEmployees";
 
 const EmployeeDetailsContainer = () => {
   const navigation = useNavigation();
   const route = useRoute();
   const employee = route.params?.employee;
+  const employeeId = employee?.id;
+  const today = new Date().toISOString().split("T")[0];
   const [refreshing, setRefreshing] = useState(false);
-  
+ const [selectedDate, setSelectedDate] = useState(new Date());
+  const {
+    data: emp,
+    isLoading: isEmployeeLoading,
+    isError: isEmployeeError,
+    refetch: refetchEmployee,
+  } = useEmployeeDetails(employeeId);
+
+  const {
+    data: locations = [],
+    isLoading: isLocationsLoading,
+    refetch: refetchLocations,
+  } = useEmployeeLocations(employeeId, 
+     selectedDate.toISOString().split("T")[0]);
+
+      const onRefresh = useCallback(async () => {
+    setRefreshing(true);
+    await Promise.all([refetchEmployee(), refetchLocations()]);
+    setRefreshing(false);
+  }, [refetchEmployee, refetchLocations]);
+
   if (!employee) {
     return (
       <SafeAreaView
@@ -25,26 +47,11 @@ const EmployeeDetailsContainer = () => {
     );
   }
 
-  const employeeId = employee.id;
-
-  const {
-    data: emp,
-    isLoading: isEmployeeLoading,
-    isError: isEmployeeError,
-    refetch: refetchEmployee,
-  } = useEmployeeDetails(employeeId);
- console.log(refetchEmployee)
-  const {
-    data: locations = [],
-    isLoading: isLocationsLoading,
-    refetch: refetchLocations,
-  } = useEmployeeLocations(employeeId);
-
-    const onRefresh = useCallback(async () => {
-    setRefreshing(true);
-    await Promise.all([refetchEmployee(), refetchLocations()]);
-    setRefreshing(false);
-  }, [refetchEmployee, refetchLocations]);
+  // const onRefresh = useCallback(async () => {
+  //   setRefreshing(true);
+  //   await Promise.all([refetchEmployee(), refetchLocations()]);
+  //   setRefreshing(false);
+  // }, [refetchEmployee, refetchLocations]);
 
   if (isEmployeeLoading || isLocationsLoading) {
     return (
@@ -71,8 +78,10 @@ const EmployeeDetailsContainer = () => {
       employee={emp}
       locations={locations}
       onBack={() => navigation.goBack()}
-      onRefresh={onRefresh}     
-      refreshing={refreshing}    
+      onRefresh={onRefresh}
+      refreshing={refreshing}
+        selectedDate={selectedDate}
+        setSelectedDate={setSelectedDate}
     />
   );
 };

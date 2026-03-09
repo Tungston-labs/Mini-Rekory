@@ -3,14 +3,10 @@ import { StyleSheet } from "react-native";
 export default StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#F6F7F8",
+    backgroundColor: "#FFFFFF",
   },
-   screen: {
-        flex: 1,
-        backgroundColor: "#F6F7F8",
-    },
 
-
+  /* Header */
   header: {
     flexDirection: "row",
     alignItems: "center",
@@ -18,7 +14,6 @@ export default StyleSheet.create({
     paddingVertical: 12,
     borderBottomWidth: 1,
     borderBottomColor: "#EEEEEE",
-
   },
   backArrow: {
     fontSize: 28,
@@ -27,32 +22,35 @@ export default StyleSheet.create({
   },
   headerTitle: {
     flex: 1,
+    textAlign: "center",
     fontSize: 16,
-    fontWeight: "400",
+    fontWeight: "600",
     color: "#000",
-    paddingLeft: 12,
-    fontFamily: "PoppinsRegular",
   },
 
+  /* Content */
   container: {
     padding: 20,
   },
 
-
+  /* Avatar */
   avatarWrapper: {
     alignSelf: "center",
     marginTop: 16,
     position: "relative",
   },
   avatar: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    backgroundColor: "#D9D9D9",
+    width: 110,
+    height: 110,
+    borderRadius: 55,
+    backgroundColor: "#E0E0E0",
     justifyContent: "center",
     alignItems: "center",
   },
-
+  avatarIcon: {
+    fontSize: 48,
+    color: "#000",
+  },
   cameraButton: {
     position: "absolute",
     right: 0,
@@ -60,31 +58,34 @@ export default StyleSheet.create({
     width: 30,
     height: 30,
     borderRadius: 15,
-    backgroundColor: "#C61217",
+    backgroundColor: "#E53935",
     justifyContent: "center",
     alignItems: "center",
   },
-
+  cameraIcon: {
+    color: "#FFF",
+    fontSize: 14,
+  },
   avatarLabel: {
     textAlign: "center",
     marginTop: 12,
-    fontSize: 16,
+    fontSize: 14,
     color: "#000",
-    fontFamily: "PoppinsMedium",
+    fontWeight: "500",
   },
 
-
+  /* Form */
   form: {
-    marginTop: 2,
+    marginTop: 24,
   },
   label: {
     fontSize: 13,
     color: "#000",
-    marginTop: 10,
-    fontFamily: "PoppinsRegular",
+    marginBottom: 6,
+    marginTop: 14,
   },
   input: {
-    height: 45,
+    height: 48,
     borderWidth: 1,
     borderColor: "#E0E0E0",
     borderRadius: 8,
@@ -92,9 +93,11 @@ export default StyleSheet.create({
     fontSize: 14,
     color: "#000",
     backgroundColor: "#FFF",
-    
+    alignContent:"center",
+    justifyContent:"center"
   },
 
+  /* Button */
   saveButton: {
     marginTop: 28,
     height: 52,
@@ -108,4 +111,14 @@ export default StyleSheet.create({
     fontSize: 16,
     fontWeight: "600",
   },
+  
+  dropdown: {
+  height: 48,
+    borderWidth: 1,
+    borderColor: "#E0E0E0",
+    borderRadius: 8,
+    fontSize: 12,
+    color: "#000",
+    backgroundColor: "#FFF",
+}
 });

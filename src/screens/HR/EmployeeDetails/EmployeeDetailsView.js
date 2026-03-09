@@ -1,23 +1,45 @@
 import React, { useState } from "react";
-import { View, Text, TouchableOpacity, Image, ScrollView, Platform ,RefreshControl} from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Image,
+  ScrollView,
+  Platform,
+  RefreshControl,
+} from "react-native";
 import { CaretLeft, PhoneCall, CalendarDots, MapPin } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
 import DateTimePicker from "@react-native-community/datetimepicker";
 
-const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , refreshing}) => {
-  const [date, setDate] = useState(new Date());
+const EmployeeDetailsView = ({
+  employee,
+  locations = [],
+  onBack,
+  onRefresh,
+  refreshing,
+  selectedDate,
+  setSelectedDate,
+}) => {
   const [showPicker, setShowPicker] = useState(false);
 
-  const onChangeDate = (event, selectedDate) => {
-    setShowPicker(Platform.OS === "ios"); 
-    if (selectedDate) setDate(selectedDate);
+  // handle date selection from the picker
+  const onChangeDate = (event, selected) => {
+    // On Android, `selected` is undefined when user cancels
+    setShowPicker(Platform.OS === "ios"); // keep picker open only on iOS if inline
+    if (selected) {
+      setSelectedDate(selected);
+    }
   };
 
   if (!employee) return null;
 
+  // fallback if parent didn't pass a date
+  const displayDate = selectedDate || new Date();
+
   return (
-    <SafeAreaView style={{ flex: 1,backgroundColor: "#F6F7F8",}} edges={["top"]}>
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }} edges={["top"]}>
       <View style={styles.container}>
         <View style={styles.profileCard}>
           <TouchableOpacity onPress={onBack} style={styles.backBtn}>
@@ -26,7 +48,9 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
 
           <View style={styles.userRow}>
             <Image
-              source={{ uri: employee.photo || "https://i.pravatar.cc/150?u=" + employee.name }}
+              source={{
+                uri: employee.photo || "https://i.pravatar.cc/150?u=" + employee.name,
+              }}
               style={styles.avatar}
             />
             <View style={styles.profileInfo}>
@@ -41,6 +65,7 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
             <PhoneCall size={18} color="#fff" />
           </TouchableOpacity>
         </View>
+
         <View style={styles.locationCard}>
           <View style={styles.locationHeader}>
             <Text style={styles.sectionTitle}>Recent Locations</Text>
@@ -51,14 +76,18 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
               >
                 <CalendarDots size={20} color="#E53935" />
                 <Text style={styles.dateText}>
-                  {date.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+                  {displayDate.toLocaleDateString("en-IN", {
+                    day: "numeric",
+                    month: "short",
+                    year: "numeric",
+                  })}
                 </Text>
               </TouchableOpacity>
             </View>
 
             {showPicker && (
               <DateTimePicker
-                value={date}
+                value={displayDate}
                 mode="date"
                 display={Platform.OS === "ios" ? "inline" : "default"}
                 onChange={onChangeDate}
@@ -67,51 +96,41 @@ const EmployeeDetailsView = ({ employee, locations = [], onBack , onRefresh , re
             )}
           </View>
 
-       <ScrollView
-  showsVerticalScrollIndicator={false}
-  contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
-  refreshControl={
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-  }
->
-  {locations.length === 0 ? (
-    <View style={styles.noLocationWrapper}>
-      <MapPin size={32} color="#B0B0B0" />
-      <Text style={styles.noLocationText}>
-        No location data available
-      </Text>
-    </View>
-  ) : (
-    locations.map((item, index) => (
-      <View key={index} style={styles.locationRow}>
-        <View style={styles.timeline}>
-          <View style={[styles.dot, item.current && styles.activeDot]}>
-            <MapPin
-              size={20}
-              color={item.current ? "#2ECC71" : "#000"}
-            />
-          </View>
+          <ScrollView
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{ flexGrow: 1, paddingBottom: 40 }}
+            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+          >
+            {locations.length === 0 ? (
+              <View style={styles.noLocationWrapper}>
+                <MapPin size={32} color="#B0B0B0" />
+                <Text style={styles.noLocationText}>No location data available</Text>
+              </View>
+            ) : (
+              locations.map((item, index) => (
+                <View key={index} style={styles.locationRow}>
+                  <View style={styles.timeline}>
+                    <View style={[styles.dot, item.current && styles.activeDot]}>
+                      <MapPin size={20} color={item.current ? "#2ECC71" : "#000"} />
+                    </View>
 
-          {index !== locations.length - 1 && (
-            <View style={styles.dashedLine} />
-          )}
-        </View>
+                    {index !== locations.length - 1 && <View style={styles.dashedLine} />}
+                  </View>
 
-        <View style={styles.locationInfo}>
-          <Text style={styles.place}>{item.place}</Text>
-          <Text style={styles.time}>{item.time}</Text>
+                  <View style={styles.locationInfo}>
+                    <Text style={styles.place}>{item.place}</Text>
+                    <Text style={styles.time}>{item.time}</Text>
 
-          {item.current && (
-            <View style={styles.currentBadge}>
-              <Text style={styles.currentText}>CURRENT</Text>
-            </View>
-          )}
-        </View>
-      </View>
-    ))
-  )}
-</ScrollView>
-
+                    {item.current && (
+                      <View style={styles.currentBadge}>
+                        <Text style={styles.currentText}>CURRENT</Text>
+                      </View>
+                    )}
+                  </View>
+                </View>
+              ))
+            )}
+          </ScrollView>
         </View>
       </View>
     </SafeAreaView>

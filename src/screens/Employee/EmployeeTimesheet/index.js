@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     View,
     Text,
@@ -10,25 +10,49 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
 import PunchInOutModal from "../../../components/Modal/PunchInOutModal";
 import useEmployeeTimesheet from "./EmployeeTimesheetContainer";
-
-const data = [
-    { id: "1", date: "27", day: "Tue", checkIn: "09:30 AM", checkOut: "06:30 PM", total: "08:00 hrs", status: "present" },
-    { id: "2", date: "26", day: "Mon", checkIn: "09:30 AM", checkOut: "06:30 PM", total: "08:00 hrs", status: "present" },
-    { id: "3", date: "25", day: "Sun", checkIn: "00:00", checkOut: "00:00", total: "00:00", status: "absent" },
-];
+import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
+import MonthPicker, {
+  ACTION_DATE_SET,
+  ACTION_DISMISSED,
+} from "react-native-month-year-picker";
 
 const EmployeeTimesheet = () => {
-    const { modalVisible,
+    const [showPicker, setShowPicker] = useState(false);
+    const {
+        data,
+        loading,
+        error,
+        modalVisible,
         selectedItem,
         openModal,
         closeModal,
         refreshing,
-        onRefresh, } =
-        useEmployeeTimesheet();
+        onRefresh,
+        year,
+        month,
+        changeMonth,
+    } = useEmployeeTimesheet();
 
     const renderItem = ({ item }) => {
         const isAbsent = item.status === "absent";
 
+        if (loading) {
+            return (
+                <SafeAreaView style={styles.container}>
+                    {[1, 2, 3, 4, 5].map((item) => (
+                        <EmployeeSkeleton key={item} />
+                    ))}
+                </SafeAreaView>
+            );
+        }
+
+        if (error) {
+            return (
+                <SafeAreaView style={styles.container}>
+                    <Text>Failed to load attendance</Text>
+                </SafeAreaView>
+            );
+        }
         return (
             <TouchableOpacity
                 onPress={() => openModal(item)}
@@ -57,7 +81,7 @@ const EmployeeTimesheet = () => {
                         </View>
 
                         <View style={styles.timeBlock}>
-                            <Text style={styles.timeText}>{item.total}</Text>
+                            <Text style={styles.timeText}>{item.total} hrs</Text>
                             <Text style={styles.label}>Total Hours</Text>
                         </View>
                     </View>
@@ -85,8 +109,16 @@ const EmployeeTimesheet = () => {
             <View style={styles.header}>
                 <Text style={styles.title}>Time Sheet</Text>
 
-                <TouchableOpacity style={styles.monthButton}>
-                    <Text style={styles.monthText}>📅 This Month</Text>
+                <TouchableOpacity
+                    style={styles.monthButton}
+                    onPress={() => setShowPicker(true)}
+                >
+                    <Text style={styles.monthText}>
+                        📅 {new Date(year, month - 1).toLocaleString("default", {
+                            month: "long",
+                            year: "numeric",
+                        })}
+                    </Text>
                 </TouchableOpacity>
             </View>
 
@@ -100,6 +132,24 @@ const EmployeeTimesheet = () => {
                 onRefresh={onRefresh}
             />
 
+           {showPicker && (
+  <MonthPicker
+    onChange={(event, newDate) => {
+      switch (event) {
+        case ACTION_DATE_SET:
+          changeMonth(newDate);
+          break;
+        case ACTION_DISMISSED:
+        default:
+          break;
+      }
+      setShowPicker(false);
+    }}
+    value={new Date(year, month - 1)}
+    minimumDate={new Date(2020, 0)} 
+    maximumDate={new Date()}        
+  />
+)}
             <PunchInOutModal
                 visible={modalVisible}
                 onClose={closeModal}

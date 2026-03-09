@@ -1,11 +1,22 @@
 import React, { useEffect, useState, useRef } from "react";
 import { Animated, Easing } from "react-native";
 import EmployeeHome from "./EmployeeHome";
+import useAttendance from "../../../hooks/employee/useAttendance";
 
-const EmployeeHomecontainer = () => {
+const EmployeeHomeContainer = () => {
   const [time, setTime] = useState(new Date());
-   const [checkedIn, setCheckedIn] = useState(false); 
+  const [refreshing, setRefreshing] = useState(false);
   const rotationValue = useRef(new Animated.Value(0)).current;
+
+  const {
+    isPunchedIn,
+    todayHours,
+    punchInTime,
+    punchOutTime,
+    handlePunchIn,
+    handlePunchOut,
+    refreshSession,   // 👈 add this from hook
+  } = useAttendance();
 
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
@@ -28,6 +39,12 @@ const EmployeeHomecontainer = () => {
     outputRange: ["0deg", "360deg"],
   });
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refreshSession();
+    setRefreshing(false);
+  };
+
   const formatTime = () => {
     return time
       .toLocaleTimeString("en-US", {
@@ -46,20 +63,20 @@ const EmployeeHomecontainer = () => {
     return `${datePart} - ${weekday}`;
   };
 
- const handleCheckIn = () => {
-    setCheckedIn(prev => !prev); 
-    console.log(checkedIn ? "Checked Out" : "Checked In");
-  };
-
   return (
     <EmployeeHome
       time={formatTime()}
       date={formatDate()}
       rotateInterpolate={rotateInterpolate}
-      onCheckIn={handleCheckIn}
-      checkedIn={checkedIn}
+      onCheckIn={isPunchedIn ? handlePunchOut : handlePunchIn}
+      checkedIn={isPunchedIn}
+      todayHours={todayHours}
+      punchInTime={punchInTime}
+      punchOutTime={punchOutTime}
+      refreshing={refreshing}
+      onRefresh={onRefresh}
     />
   );
 };
 
-export default EmployeeHomecontainer;
+export default EmployeeHomeContainer;

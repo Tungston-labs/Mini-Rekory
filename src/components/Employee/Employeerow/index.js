@@ -4,7 +4,7 @@ import { MapPin ,CaretRight } from "phosphor-react-native";
 import styles from "./style";
 
 const EmployeeRow = ({ name, location, status ,onPress }) => {
-  const active = status === "active";
+const active = status === "Active";
 
   return (
     <TouchableOpacity style={styles.row} onPress={onPress}>

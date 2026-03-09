@@ -1,11 +1,5 @@
-import React from "react";
-import {
-  View,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  TextInput,
-} from "react-native";
+import React, { useState, useMemo } from "react";
+import { View, Text, FlatList, TextInput, TouchableOpacity } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MagnifyingGlass } from "phosphor-react-native";
 import DepartmentModal from "../../../components/Modal/Department";
@@ -14,7 +8,6 @@ import styles from "./style";
 
 const DepartmentItem = ({ name }) => {
   const initial = name ? name.charAt(0).toUpperCase() : "?";
-
   return (
     <View style={styles.row}>
       <View style={styles.avatar}>
@@ -35,8 +28,17 @@ const DepartmentsScreenUI = ({
   isAdding,
   refreshing,
   onRefresh,
+  onEndReached,
+  isFetchingNextPage,
 }) => {
-  console.log({ showModal })
+  const [searchText, setSearchText] = useState("");
+
+  const filteredDepartments = useMemo(() => {
+    return departments.filter((dep) =>
+      dep.name.toLowerCase().includes(searchText.toLowerCase())
+    );
+  }, [departments, searchText]);
+
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1, padding: 16 }}>
@@ -69,11 +71,12 @@ const DepartmentsScreenUI = ({
           placeholder="Search Department Name"
           placeholderTextColor="#9E9E9E"
           style={styles.searchInput}
+          value={searchText}
+          onChangeText={setSearchText}
         />
       </View>
-
       <FlatList
-        data={departments}
+        data={filteredDepartments}               // use filtered list
         keyExtractor={(item) => item.id?.toString()}
         renderItem={({ item }) => <DepartmentItem name={item.name} />}
         ItemSeparatorComponent={() => <View style={styles.separator} />}
@@ -81,17 +84,16 @@ const DepartmentsScreenUI = ({
         showsVerticalScrollIndicator={false}
         refreshing={refreshing}
         onRefresh={onRefresh}
+        onEndReached={onEndReached}
+        onEndReachedThreshold={0.5}
+        ListFooterComponent={isFetchingNextPage ? <Text>Loading more ...</Text> : null}
       />
-
       <TouchableOpacity
         style={styles.fab}
-        onPress={() => {
-          setShowModal(true);
-        }}
+        onPress={() => setShowModal(true)}
       >
         <Text style={styles.fabIcon}>＋</Text>
       </TouchableOpacity>
-
 
       <DepartmentModal
         visible={showModal}
