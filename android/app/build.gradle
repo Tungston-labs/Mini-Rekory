@@ -108,12 +108,28 @@ android {
 }
 
 dependencies {
-    // The version of react-native is set by the React Native Gradle Plugin
     implementation("com.facebook.react:react-android")
+    
+    // Upgrade to 21.2.0 (Better support for SDK 35/36)
+    implementation "com.google.android.gms:play-services-location:21.2.0" 
 
     if (hermesEnabled.toBoolean()) {
         implementation("com.facebook.react:hermes-android")
     } else {
         implementation jscFlavor
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+    }
+
+    configurations.all {
+        resolutionStrategy {
+            // REMOVE or UPDATE this to match 21.2.0
+            force "com.google.android.gms:play-services-location:21.2.0"
+        }
     }
 }

@@ -135,9 +135,17 @@ export default StyleSheet.create({
   },
 
   profile: {
-    width: 45,
-    height: 45,
+    width: 40,
+    height: 40,
     borderRadius: 22,
   },
+  profileIcon: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: "#E5E7EB",
+  justifyContent: "center",
+  alignItems: "center",
+},
 
 });

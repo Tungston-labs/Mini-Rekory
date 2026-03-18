@@ -13,7 +13,7 @@ export const getEmployeeAttendance = async ({ month, year }) => {
 };
 
 export const getEmployeeDayAttendance = async ( date ) => {
-  const res = await api.get("/attendance/employee/me/day/", {
+  const res = await api.get("/attendance/me/day/", {
     params: { date },
   });
 

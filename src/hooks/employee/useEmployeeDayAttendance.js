@@ -6,19 +6,17 @@ const useEmployeeDayAttendance = (date) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  const fetchDayAttendance = async () => {
-    try {
-      setLoading(true);
-      const data = await getEmployeeDayAttendance(date);
-      setSessions(data.sessions || []);
-      setError(null);
-    } catch (err) {
-      setError(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
+const fetchDayAttendance = async () => {
+  try {
+    setLoading(true);
+    const data = await getEmployeeDayAttendance(date);
+    setSessions(data.sessions || []);
+  } catch (err) {
+    console.log("API ERROR:", err);
+  } finally {
+    setLoading(false);
+  }
+};
   useEffect(() => {
     if (date) {
       fetchDayAttendance();

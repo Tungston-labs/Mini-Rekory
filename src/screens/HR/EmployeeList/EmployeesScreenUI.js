@@ -2,16 +2,16 @@ import React from "react";
 import {
   View,
   Text,
-  ScrollView,
   TouchableOpacity,
   TextInput,
+  FlatList,
+  RefreshControl,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { MagnifyingGlass, Sliders } from "phosphor-react-native";
 import EmployeeRow from "../../../components/Employee/Employeerow";
 import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
 import styles from "./style";
-import { RefreshControl } from "react-native";
 
 const EmployeesScreenUI = ({
   employees,
@@ -27,6 +27,8 @@ const EmployeesScreenUI = ({
   setShowFilter,
   onAddEmployee,
   onEmployeePress,
+  loadMore,
+  isFetchingNextPage,
 }) => {
   if (isLoading) {
     return (
@@ -51,10 +53,13 @@ const EmployeesScreenUI = ({
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }} edges={["top"]}>
       <View style={styles.container}>
+
+        {/* Header */}
         <View style={styles.header}>
           <Text style={styles.title}>All Employees</Text>
         </View>
 
+        {/* Search + Filter */}
         <View style={styles.searchRow}>
           <View style={styles.searchBox}>
             <MagnifyingGlass size={18} color="#9E9E9E" />
@@ -75,6 +80,7 @@ const EmployeesScreenUI = ({
           </TouchableOpacity>
         </View>
 
+        {/* Filter Dropdown */}
         {showFilter && (
           <View style={styles.dropdown}>
             {["all", "active", "inactive"].map((item) => (
@@ -99,33 +105,42 @@ const EmployeesScreenUI = ({
           </View>
         )}
 
-        <ScrollView
-          contentContainerStyle={styles.list}
-          refreshControl={
-            <RefreshControl
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
-        >
-          <View style={styles.listContainerFullWidth}>
-            {employees.map((emp, index) => (
-              <React.Fragment key={emp.id || index}>
-                <EmployeeRow
-                  name={emp.name}
-                    location={emp.location?.split(",")[0]}  
-                  status={emp.status}
-                  onPress={() => {
-                     console.log("Clicked employee:", emp);
-                     onEmployeePress(emp)}}
-                />
-                {index !== employees.length - 1 && <View style={styles.hr} />}
-              </React.Fragment>
-            ))}
-          </View>
-        </ScrollView>
 
+        <FlatList
+  style={{ flex: 1 }}
+  data={employees}
+  keyExtractor={(item) => item.id.toString()}
+  contentContainerStyle={{ paddingBottom: 120 }}
+  refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  }
+  onEndReached={loadMore}
+  onEndReachedThreshold={0.3}
+  ListFooterComponent={
+    isFetchingNextPage ? (
+      <View style={{ padding: 20 }}>
+        <Text style={{ textAlign: "center" }}>Loading more...</Text>
+      </View>
+    ) : null
+  }
+         renderItem={({ item, index }) => (
+  <View>
+    <EmployeeRow
+      name={item.name}
+      location={item.location?.split(",")[0]}
+      status={item.status}
+      onPress={() => {
+        console.log("Clicked employee:", item);
+        onEmployeePress(item);
+      }}
+    />
 
+    {index !== employees.length - 1 && <View style={styles.hr} />}
+  </View>
+)}
+        />
+
+        {/* Floating Add Button */}
         <TouchableOpacity style={styles.fab} onPress={onAddEmployee}>
           <Text style={styles.fabIcon}>＋</Text>
         </TouchableOpacity>

@@ -27,8 +27,8 @@ export default StyleSheet.create({
   },
 
   profileImage: {
-    width: 45,
-    height: 45,
+    width: 40,
+    height: 40,
     borderRadius: 22,
   },
 
@@ -130,5 +130,13 @@ modalTitle: {
 modalText: {
     fontSize: 18,
     marginBottom: 10,
+},
+  profileIcon: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: "#E5E7EB",
+  justifyContent: "center",
+  alignItems: "center",
 },
 });

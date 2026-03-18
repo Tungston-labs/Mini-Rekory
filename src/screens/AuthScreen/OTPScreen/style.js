@@ -7,7 +7,7 @@ export default StyleSheet.create({
     flex: 1,
     backgroundColor: "#FFF",
     paddingHorizontal: 24,
-    paddingTop: 60,
+    paddingTop: 90,
       paddingBottom: 40,
   },
 
@@ -63,7 +63,12 @@ export default StyleSheet.create({
     paddingVertical: 14,
     fontSize: 14,
   },
-
+ logo: {
+    width: width * 0.35,
+    height: width * 0.35,
+    alignSelf: "center",
+    marginVertical: 32,
+  },
   options: {
     flexDirection: "row",
     justifyContent: "space-between",

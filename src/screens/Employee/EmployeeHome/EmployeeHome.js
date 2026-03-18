@@ -12,8 +12,11 @@ import Svg, { Defs, LinearGradient, Stop, Circle } from "react-native-svg";
 import { Fingerprint, Clock, Timer, ClockUser } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
-
+import { User } from "phosphor-react-native";
 const EmployeeHome = ({
+  name,
+  profilePic,
+    greeting,
   time,
   date,
   rotateInterpolate,
@@ -35,16 +38,20 @@ const EmployeeHome = ({
       >
         <View style={styles.header}>
           <View>
-            <Text style={styles.hello}>Hello Arjun!</Text>
-            <Text style={styles.subText}>
-              Good Morning Mark Your Attendance
-            </Text>
+    <Text style={styles.hello}>Hello {name || "Employee"}!</Text>
+           <Text style={styles.subText}>{greeting}</Text>
           </View>
 
-          <Image
-            source={{ uri: "https://i.pravatar.cc/150?img=12" }}
-            style={styles.profile}
-          />
+    {profilePic && profilePic.length > 0 ? (
+  <Image
+    source={{ uri: profilePic }}
+    style={styles.profile}
+  />
+) : (
+  <View style={styles.profileIcon}>
+    <User size={30} color="#777" weight="fill" />
+  </View>
+)}
         </View>
 
         <View style={styles.timeContainer}>
@@ -113,9 +120,9 @@ const EmployeeHome = ({
             <Text style={styles.statDivider}>
               {punchInTime
                 ? new Date(punchInTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : "-----"}
             </Text>
             <Text style={styles.statLabel}>Check In</Text>
@@ -126,9 +133,9 @@ const EmployeeHome = ({
             <Text style={styles.statDivider}>
               {punchOutTime
                 ? new Date(punchOutTime).toLocaleTimeString([], {
-                    hour: "2-digit",
-                    minute: "2-digit",
-                  })
+                  hour: "2-digit",
+                  minute: "2-digit",
+                })
                 : "-----"}
             </Text>
             <Text style={styles.statLabel}>Check Out</Text>

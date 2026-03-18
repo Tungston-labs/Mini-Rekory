@@ -15,7 +15,7 @@ import MonthPicker, {
   ACTION_DATE_SET,
   ACTION_DISMISSED,
 } from "react-native-month-year-picker";
-
+import { User } from "phosphor-react-native";
 const EmployeeTimesheet = () => {
     const [showPicker, setShowPicker] = useState(false);
     const {
@@ -31,28 +31,31 @@ const EmployeeTimesheet = () => {
         year,
         month,
         changeMonth,
+          name,
+  profilePic,
+  getGreeting
     } = useEmployeeTimesheet();
 
     const renderItem = ({ item }) => {
         const isAbsent = item.status === "absent";
 
-        if (loading) {
-            return (
-                <SafeAreaView style={styles.container}>
-                    {[1, 2, 3, 4, 5].map((item) => (
-                        <EmployeeSkeleton key={item} />
-                    ))}
-                </SafeAreaView>
-            );
-        }
+      if (loading) {
+  return (
+    <SafeAreaView style={styles.container}>
+      {[1,2,3,4,5].map((item) => (
+        <EmployeeSkeleton key={item} />
+      ))}
+    </SafeAreaView>
+  );
+}
 
-        if (error) {
-            return (
-                <SafeAreaView style={styles.container}>
-                    <Text>Failed to load attendance</Text>
-                </SafeAreaView>
-            );
-        }
+if (error) {
+  return (
+    <SafeAreaView style={styles.container}>
+      <Text>Failed to load attendance</Text>
+    </SafeAreaView>
+  );
+}
         return (
             <TouchableOpacity
                 onPress={() => openModal(item)}
@@ -94,16 +97,20 @@ const EmployeeTimesheet = () => {
         <SafeAreaView style={styles.container}>
             <View style={styles.topSection}>
                 <View>
-                    <Text style={styles.hello}>Hello Arjun!</Text>
-                    <Text style={styles.subText}>
-                        Good Morning Mark Your Attendance
-                    </Text>
+                   <Text style={styles.hello}>Hello {name || "Employee"}!</Text>
+             <Text style={styles.subText}>{getGreeting()}</Text>
                 </View>
 
-                <Image
-                    source={{ uri: "https://i.pravatar.cc/150?img=12" }}
-                    style={styles.profileImage}
-                />
+              {profilePic ? (
+  <Image
+    source={{ uri: profilePic }}
+    style={styles.profileImage}
+  />
+) : (
+  <View style={styles.profileIcon}>
+    <User size={30} color="#777" weight="fill" />
+  </View>
+)}
             </View>
 
             <View style={styles.header}>

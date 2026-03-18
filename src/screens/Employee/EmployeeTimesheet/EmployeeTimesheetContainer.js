@@ -1,5 +1,6 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo,useEffect } from "react";
 import useEmployeeAttendance from "../../../hooks/employee/useEmployeeAttendance";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const useEmployeeTimesheet = () => {
   const today = new Date();
@@ -13,7 +14,27 @@ const useEmployeeTimesheet = () => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedItem, setSelectedItem] = useState(null);
   const [refreshing, setRefreshing] = useState(false);
+  const [name, setName] = useState("");
+  const [profilePic, setProfilePic] = useState(null);
 
+  useEffect(() => {
+  const loadUser = async () => {
+    try {
+      const userData = await AsyncStorage.getItem("user");
+
+      if (userData) {
+        const user = JSON.parse(userData);
+
+        setName(user.name);
+        setProfilePic(user.profile_pic);
+      }
+    } catch (error) {
+      console.log("USER LOAD ERROR:", error);
+    }
+  };
+
+  loadUser();
+}, []);
  const changeMonth = (date) => {
     setMonth(date.getMonth() + 1);
     setYear(date.getFullYear());
@@ -103,6 +124,17 @@ const formattedData = useMemo(() => {
     setRefreshing(false);
   };
 
+  const getGreeting = () => {
+    const hour = new Date().getHours();
+
+    if (hour < 12) {
+      return "Good Morning, Mark Your Attendance";
+    } else if (hour < 17) {
+      return "Good Afternoon, Mark Your Attendance";
+    } else {
+      return "Good Evening, Mark Your Attendance";
+    }
+  };
   return {
     data: formattedData,
     loading,
@@ -116,6 +148,9 @@ const formattedData = useMemo(() => {
     changeMonth,
     month,
     year,
+      name,
+  profilePic,
+  getGreeting
   };
 };
 

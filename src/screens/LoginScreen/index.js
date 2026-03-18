@@ -14,16 +14,16 @@ import { Eye, EyeSlash } from "phosphor-react-native";
 import styles from "./style";
 import { useAuth } from "../../context/AuthContext";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import api from "../../services/api"; 
+import api from "../../services/api";
 import { useNavigation } from "@react-navigation/native";
 
-const LoginScreen = ( ) => {
+const LoginScreen = () => {
   const navigation = useNavigation();
   const [secure, setSecure] = useState(true);
-  const { setUserRole, setUsername } = useAuth();
   const [usernameInput, setUsernameInput] = useState("");
   const [password, setPassword] = useState("");
-const { login } = useAuth();
+  const { login } = useAuth();
+
 const handleLogin = async () => {
   if (!usernameInput || !password) {
     Alert.alert("Validation Error", "Username and password are required");
@@ -31,24 +31,22 @@ const handleLogin = async () => {
   }
 
   try {
-console.log("Typed Email:", usernameInput);
-console.log("Typed Password:", password);
+    const res = await api.post("/auth/login/", {
+      email: usernameInput,
+      password: password,
+    });
 
-const res = await api.post("/auth/login/", {
-  email: usernameInput,
-  password: password,
-});
-
-    console.log("LOGIN RESPONSE:", res.data);
+    const user = res.data.user;
 
     await AsyncStorage.setItem("accessToken", res.data.access);
     await AsyncStorage.setItem("refreshToken", res.data.refresh);
 
-    console.log("Token saved successfully");
-    const role = res.data.user.role;
-    login(res.data.user.role, res.data.user.email);
 
-    Alert.alert("Success", `Logged in as ${role}`);
+await AsyncStorage.setItem("user", JSON.stringify(user));
+console.log("USER SAVED:", user);
+    await login(user.role, user.email);
+
+    Alert.alert("Success", `Welcome ${user.name}`);
 
   } catch (error) {
     console.log("LOGIN ERROR:", error.response?.data || error.message);
@@ -117,9 +115,9 @@ const res = await api.post("/auth/login/", {
               <View style={styles.checkbox} />
               <Text style={styles.rememberText}>Keep me signed in</Text>
             </View>
-   <TouchableOpacity onPress={() => navigation.navigate("Forget")}>
-  <Text style={styles.forgot}>Forgot password</Text>
-</TouchableOpacity>
+            <TouchableOpacity onPress={() => navigation.navigate("Forget")}>
+              <Text style={styles.forgot}>Forgot password</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Login Button */}

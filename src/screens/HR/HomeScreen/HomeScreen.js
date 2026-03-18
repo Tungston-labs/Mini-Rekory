@@ -13,14 +13,17 @@ import { MagnifyingGlass } from "phosphor-react-native";
 import StatCard from "../../../components/HomeScreen/StatCard";
 import EmployeeRow from "../../../components/HomeScreen/EmployeeRow";
 import styles from "./style";
-
+import { User } from "phosphor-react-native";
 const HomeScreenUI = ({
+  name,
+  profilePic,
   search,
+  greeting,
   setSearch,
   employees = [],
   totalEmployees,
   activeEmployees,
-    absentToday,
+  absentToday,
   isLoading,
   isError,
   isFetching,
@@ -50,14 +53,20 @@ console.log("loded home")
         {/* Header */}
         <View style={styles.header}>
           <View>
-            <Text style={styles.greeting}>Good Morning Meera!</Text>
-            <Text style={styles.subText}>Welcome to REKORY</Text>
+            <Text style={styles.greeting}>{greeting} </Text>
+            <Text style={styles.subText}>Welcome to {name || "Company"}</Text>
           </View>
 
-          <Image
-            source={{ uri: "https://i.pravatar.cc/100" }}
-            style={styles.avatar}
-          />
+          {profilePic && profilePic.length > 0 ? (
+           <Image
+             source={{ uri: profilePic }}
+             style={styles.profile}
+           />
+         ) : (
+           <View style={styles.profileIcon}>
+             <User size={30} color="#777" weight="fill" />
+           </View>
+         )}
         </View>
 
         {/* Search */}

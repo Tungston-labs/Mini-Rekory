@@ -11,7 +11,7 @@ export const AuthProvider = ({ children }) => {
 
   const isLoggedIn = !!userRole;
 
-  // 🔹 Restore login when app starts
+
   useEffect(() => {
     const loadUser = async () => {
       try {
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  // 🔹 Login function
+
   const login = async (role, email) => {
     setUserRole(role);
     setUsername(email);
@@ -40,8 +40,7 @@ export const AuthProvider = ({ children }) => {
     await AsyncStorage.setItem("userRole", role);
     await AsyncStorage.setItem("userEmail", email);
   };
-
-  // 🔹 Logout function
+  
   const logout = async () => {
     setUserRole(null);
     setUsername("");

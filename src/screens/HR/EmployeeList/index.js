@@ -12,7 +12,7 @@ const EmployeesScreen = () => {
   const [showFilter, setShowFilter] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
 
-
+  // Debounce search
   useEffect(() => {
     const timer = setTimeout(() => {
       setDebouncedSearch(search);
@@ -22,17 +22,28 @@ const EmployeesScreen = () => {
   }, [search]);
 
   const {
-    data: employees = [],
+    data,
     isLoading,
     isError,
     refetch,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
   } = useLiveEmployees(debouncedSearch, filter);
+
+const employees = data?.pages.flatMap((page) => page.results) || [];
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);
     await refetch();
     setRefreshing(false);
   }, [refetch]);
+
+  const loadMore = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  }, [hasNextPage, isFetchingNextPage]);
 
   return (
     <EmployeesScreenUI
@@ -47,6 +58,8 @@ const EmployeesScreen = () => {
       setShowFilter={setShowFilter}
       refreshing={refreshing}
       onRefresh={onRefresh}
+      loadMore={loadMore}
+      isFetchingNextPage={isFetchingNextPage}
       onAddEmployee={() => navigation.navigate("AddEmployee")}
       onEmployeePress={(emp) =>
         navigation.navigate("EmployeeDetails", { employee: emp })

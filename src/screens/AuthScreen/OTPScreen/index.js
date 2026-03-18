@@ -8,54 +8,58 @@ import {
   Platform,
   ScrollView,
   Alert,
+  Image
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
-import styles from "./style"; 
-import api from "../../services/api";
+import { useNavigation, useRoute } from "@react-navigation/native";
+import styles from "./style";
+import { useForgotPassword } from "../../../hooks/auth/useForgotPassword";
 
 const OTPScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+  const { email } = route.params;
+  const { verifyOtpCode, loading } = useForgotPassword();
   const [otp, setOtp] = useState(["", "", "", "", "", ""]);
   const inputsRef = useRef([]);
-  const [loading, setLoading] = useState(false);
 
-  // Handle OTP input changes
   const handleChange = (text, index) => {
     if (/^\d*$/.test(text)) {
       const newOtp = [...otp];
       newOtp[index] = text;
       setOtp(newOtp);
 
-      // Move to next input
       if (text && index < 5) {
-        inputsRef.current[index + 1].focus();
+        inputsRef.current[index + 1]?.focus();
       }
 
-      // Move to previous input if cleared
       if (!text && index > 0) {
-        inputsRef.current[index - 1].focus();
+        inputsRef.current[index - 1]?.focus();
       }
     }
   };
 
   const handleSubmit = async () => {
     const otpCode = otp.join("");
+
     if (otpCode.length < 6) {
       Alert.alert("Validation Error", "Please enter the 6-digit OTP");
       return;
     }
 
-    setLoading(true);
     try {
-      const res = await api.post("/auth/verify-otp/", { otp: otpCode });
+      const res = await verifyOtpCode(email, otpCode);
+      const resetToken = res.reset_token;
       Alert.alert("Success", "OTP verified successfully");
-      // Navigate to login or reset password screen
-      navigation.navigate("Login");
+      navigation.navigate("ResetPassword", {
+        resetToken,
+      });
     } catch (error) {
-      console.log("OTP Verification Error:", error.response?.data || error.message);
-      Alert.alert("Error", "Invalid OTP. Please try again.");
-    } finally {
-      setLoading(false);
+      console.log("OTP Verification Error:", error);
+
+      Alert.alert(
+        "Error",
+        error?.message || "Invalid or expired OTP"
+      );
     }
   };
 
@@ -69,13 +73,26 @@ const OTPScreen = () => {
         keyboardShouldPersistTaps="handled"
         showsVerticalScrollIndicator={false}
       >
+        
         <View style={styles.container}>
+          <Image
+            source={require("../../../../assets/images/rekory.png")}
+            style={styles.logo}
+            resizeMode="contain"
+          />
           <Text style={styles.title}>Enter OTP</Text>
+
           <Text style={styles.subtitle}>
-            Enter the 6-digit code sent to your registered email/phone.
+            Enter the 6-digit code sent to your email.
           </Text>
 
-          <View style={{ flexDirection: "row", justifyContent: "space-between", marginVertical: 20 }}>
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              marginVertical: 20,
+            }}
+          >
             {otp.map((digit, index) => (
               <TextInput
                 key={index}
@@ -96,7 +113,6 @@ const OTPScreen = () => {
             ))}
           </View>
 
-          {/* Submit Button */}
           <TouchableOpacity
             onPress={handleSubmit}
             style={styles.button}
@@ -107,7 +123,6 @@ const OTPScreen = () => {
             </Text>
           </TouchableOpacity>
 
-          {/* Back to Login */}
           <TouchableOpacity
             onPress={() => navigation.navigate("Login")}
             style={{ marginTop: 15 }}

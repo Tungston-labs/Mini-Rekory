@@ -12,12 +12,12 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import styles from "./styles";
-import api from "../../services/api"; 
+import { useForgotPassword } from "../../../hooks/auth/useForgotPassword";
 
 const ForgetScreen = () => {
-  const navigation = useNavigation(); // <--- Add this
+  const navigation = useNavigation();
+  const { sendOtp, loading } = useForgotPassword();
   const [email, setEmail] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const handlePasswordReset = async () => {
     if (!email) {
@@ -25,19 +25,20 @@ const ForgetScreen = () => {
       return;
     }
 
-    setLoading(true);
     try {
-      await api.post("/auth/password-reset/", { email });
-      Alert.alert(
-        "Success",
-        "If this email exists, a password reset link has been sent."
-      );
-      setEmail("");
+      const res = await sendOtp(email);
+
+      Alert.alert("Success", res.message);
+
+      navigation.navigate("VerifyOtp", { email });
+
     } catch (error) {
-      console.log("Password Reset Error:", error.response?.data || error.message);
-      Alert.alert("Error", "Something went wrong. Please try again.");
-    } finally {
-      setLoading(false);
+      console.log("Forgot Password Error:", error);
+
+      Alert.alert(
+        "Error",
+        error?.message || "Something went wrong"
+      );
     }
   };
 
@@ -53,19 +54,19 @@ const ForgetScreen = () => {
       >
         <View style={styles.container}>
           <Text style={styles.title}>Forgot Password</Text>
+
           <Text style={styles.subtitle}>
-            Enter your registered email to receive a password reset link.
+            Enter your registered email to receive OTP.
           </Text>
 
-          {/* Logo */}
           <Image
-            source={require("../../../assets/images/rekory.png")}
+            source={require("../../../../assets/images/rekory.png")}
             style={styles.logo}
             resizeMode="contain"
           />
 
-          {/* Email Input */}
           <Text style={styles.label}>Email</Text>
+
           <TextInput
             placeholder="Enter your email"
             placeholderTextColor="#A0A0A0"
@@ -76,28 +77,25 @@ const ForgetScreen = () => {
             autoCapitalize="none"
           />
 
-          {/* Back to Login */}
-        
-
-          {/* Submit Button */}
           <TouchableOpacity
             onPress={handlePasswordReset}
             style={styles.button}
             disabled={loading}
           >
             <Text style={styles.buttonText}>
-              {loading ? "Sending..." : "Send Reset Link"}
+              {loading ? "Sending..." : "Send OTP"}
             </Text>
           </TouchableOpacity>
 
-            <TouchableOpacity
-            onPress={() => navigation.navigate("Login")} 
+          <TouchableOpacity
+            onPress={() => navigation.navigate("Login")}
             style={{ marginTop: 10, marginBottom: 20 }}
           >
             <Text style={{ color: "#C61217", textAlign: "center" }}>
               Back to Login
             </Text>
           </TouchableOpacity>
+
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
