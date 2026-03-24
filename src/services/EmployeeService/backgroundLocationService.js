@@ -1,37 +1,29 @@
 import Geolocation from "react-native-geolocation-service";
 import ReactNativeForegroundService from "@supersami/rn-foreground-service";
-import {
-  requestForegroundLocationPermission,
-  requestBackgroundLocationPermission,
-} from "./permissionService";
 import { locationUpdateApi } from "./attendanceService";
 import { getPlaceName } from "./locationService";
 
 let watchId = null;
 let isSending = false;
-
-const formatCoordinate = (value) => Number(value.toFixed(6));
+let isServiceRunning = false;
 
 export const startLocationTracking = async () => {
   try {
     console.log("Starting location tracking...");
 
-    const isRunning = await ReactNativeForegroundService.isRunning();
-
-    if (!isRunning) {
+    if (!isServiceRunning) {
       await ReactNativeForegroundService.start({
         id: 144,
         title: "Attendance Tracking",
         message: "Tracking your live location",
-        icon: "ic_launcher",
         ServiceType: "location",
+        channelId: "foreground_service_channel",
       });
+
+      isServiceRunning = true;
     }
 
-    if (watchId !== null) {
-      console.log("Watcher already running");
-      return;
-    }
+    if (watchId !== null) return;
 
     watchId = Geolocation.watchPosition(
       async (position) => {
@@ -54,8 +46,6 @@ export const startLocationTracking = async () => {
             place_name: place,
             accuracy,
           });
-        } catch (err) {
-          console.log("Location update error:", err);
         } finally {
           isSending = false;
         }
@@ -63,9 +53,8 @@ export const startLocationTracking = async () => {
       (error) => console.log("Watch error:", error),
       {
         enableHighAccuracy: true,
-        distanceFilter: 20,
-        interval: 60000,
-        fastestInterval: 30000,
+        interval: 120000,
+        fastestInterval: 120000,
       }
     );
   } catch (error) {
@@ -75,19 +64,15 @@ export const startLocationTracking = async () => {
 
 export const stopLocationTracking = async () => {
   try {
-    console.log("Stopping location tracking...");
-
     if (watchId !== null) {
       Geolocation.clearWatch(watchId);
       watchId = null;
     }
 
-    const isRunning = await ReactNativeForegroundService.isRunning();
-    if (isRunning) {
+    if (isServiceRunning) {
       await ReactNativeForegroundService.stopAll();
+      isServiceRunning = false;
     }
-
-    console.log("Tracking stopped");
   } catch (error) {
     console.log("Stop tracking error:", error);
   }

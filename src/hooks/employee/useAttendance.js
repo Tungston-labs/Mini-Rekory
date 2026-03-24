@@ -35,30 +35,51 @@ const getLocation = () =>
     );
   });
 
+
   // ---------------- Punch In ----------------
-const handlePunchIn = async () => {
-  try {
-    if (!isFocused) return;
+  const handlePunchIn = async () => {
+    try {
+      if (!isFocused) return;
 
-    console.log("➡️ Requesting foreground permission");
-    const granted = await requestForegroundLocationPermission();
-    if (!granted) {
-      console.log("❌ Permission denied");
-      return;
+      console.log("➡️ Requesting foreground permission");
+      const granted = await requestForegroundLocationPermission();
+      if (!granted) {
+        console.log("❌ Permission denied");
+        return;
+      }
+
+      console.log("➡️ Punch In: Getting location");
+      const pos = await getLocation();   
+      console.log("📍 FULL POSITION:", pos);
+
+      const { latitude, longitude } = pos.coords;
+      const lat = Number(latitude.toFixed(6));
+      const lng = Number(longitude.toFixed(6));
+      const place = await getPlaceName(lat, lng).catch(() => "Unknown");
+
+      const res = await punchInApi({ lat, lng, place_name: place });
+      console.log("✅ PunchIn API success");
+
+      setIsPunchedIn(true);
+      if (res?.punch_in_time) {
+        setPunchInTime(res.punch_in_time);
+      }
+    } catch (error) {
+      console.log("❌ Punch in error:", error);
+      throw error;
     }
-
-    console.log("➡️ Punch In: Getting location");
-    const pos = await getLocation(); 
-    console.log("📍 FULL POSITION:", pos);
-
-  } catch (error) {
-    console.log("❌ Punch in error:", error);
-  }
-};
+  };
 
   // ---------------- Punch Out ----------------
   const handlePunchOut = async () => {
     try {
+      console.log("➡️ Requesting foreground permission for Punch Out");
+      const granted = await requestForegroundLocationPermission();
+      if (!granted) {
+        console.log("❌ Permission denied");
+        throw new Error("Location permission denied");
+      }
+
       console.log("➡️ Punch Out: Getting location");
       const pos = await getLocation();
 
@@ -71,13 +92,14 @@ const handlePunchIn = async () => {
       console.log("✅ PunchOut API success");
 
       setIsPunchedIn(false);
-      setPunchOutTime(res.punch_out_time);
-      setTodayHours(res.today_total_hours);
+      if (res?.punch_out_time) setPunchOutTime(res.punch_out_time);
+      if (res?.today_total_hours) setTodayHours(res.today_total_hours);
 
       await stopLocationTracking();
 
     } catch (error) {
       console.log("❌ Punch Out Error:", error);
+      throw error;
     }
   };
 
