@@ -13,10 +13,11 @@ import { Fingerprint, Clock, Timer, ClockUser } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
 import { User } from "phosphor-react-native";
+
 const EmployeeHome = ({
   name,
   profilePic,
-    greeting,
+  greeting,
   time,
   date,
   rotateInterpolate,
@@ -28,6 +29,15 @@ const EmployeeHome = ({
   refreshing,
   onRefresh,
 }) => {
+  // Format punch times to HH:mm
+  const formatTime = (isoString) =>
+    isoString
+      ? new Date(isoString).toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+        })
+      : "-----";
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView
@@ -36,32 +46,31 @@ const EmployeeHome = ({
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
         }
       >
+        {/* Header */}
         <View style={styles.header}>
           <View>
-    <Text style={styles.hello}>Hello {name || "Employee"}!</Text>
-           <Text style={styles.subText}>{greeting}</Text>
+            <Text style={styles.hello}>Hello {name || "Employee"}!</Text>
+            <Text style={styles.subText}>{greeting}</Text>
           </View>
 
-    {profilePic && profilePic.length > 0 ? (
-  <Image
-    source={{ uri: profilePic }}
-    style={styles.profile}
-  />
-) : (
-  <View style={styles.profileIcon}>
-    <User size={30} color="#777" weight="fill" />
-  </View>
-)}
+          {profilePic ? (
+            <Image source={{ uri: profilePic }} style={styles.profile} />
+          ) : (
+            <View style={styles.profileIcon}>
+              <User size={30} color="#777" weight="fill" />
+            </View>
+          )}
         </View>
 
+        {/* Clock */}
         <View style={styles.timeContainer}>
           <Text style={styles.timeText}>{time}</Text>
           <Text style={styles.dateText}>{date}</Text>
         </View>
 
+        {/* Animated Check In Circle */}
         <View style={styles.circleWrapper}>
           <View style={styles.outerGlow} />
-
           <Animated.View style={{ transform: [{ rotate: rotateInterpolate }] }}>
             <Svg height="280" width="280" viewBox="0 0 100 100">
               <Defs>
@@ -78,7 +87,6 @@ const EmployeeHome = ({
                   />
                 </LinearGradient>
               </Defs>
-
               <Circle
                 cx="50"
                 cy="50"
@@ -114,36 +122,23 @@ const EmployeeHome = ({
           </TouchableOpacity>
         </View>
 
+        {/* Stats */}
         <View style={styles.statsContainer}>
           <View style={styles.statBox}>
             <Clock size={32} color="#C53030" />
-            <Text style={styles.statDivider}>
-              {punchInTime
-                ? new Date(punchInTime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                : "-----"}
-            </Text>
+            <Text style={styles.statDivider}>{formatTime(punchInTime)}</Text>
             <Text style={styles.statLabel}>Check In</Text>
           </View>
 
           <View style={styles.statBox}>
             <Timer size={32} color="#C53030" />
-            <Text style={styles.statDivider}>
-              {punchOutTime
-                ? new Date(punchOutTime).toLocaleTimeString([], {
-                  hour: "2-digit",
-                  minute: "2-digit",
-                })
-                : "-----"}
-            </Text>
+            <Text style={styles.statDivider}>{formatTime(punchOutTime)}</Text>
             <Text style={styles.statLabel}>Check Out</Text>
           </View>
 
           <View style={styles.statBox}>
             <ClockUser size={32} color="#C53030" />
-            <Text style={styles.statDivider}>{todayHours || "-----"}</Text>
+            <Text style={styles.statDivider}>{todayHours || "0h 0m"}</Text>
             <Text style={styles.statLabel}>Total Hours</Text>
           </View>
         </View>

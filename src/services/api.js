@@ -10,7 +10,16 @@ const api = axios.create({
 let isRefreshing = false;
 let refreshSubscribers = [];
 
-/* Add request interceptor */
+const onRefreshed = (token) => {
+  refreshSubscribers.forEach((callback) => callback(token));
+  refreshSubscribers = [];
+};
+
+const addRefreshSubscriber = (callback) => {
+  refreshSubscribers.push(callback);
+};
+
+/* REQUEST */
 api.interceptors.request.use(
   async (config) => {
     const token = await AsyncStorage.getItem("accessToken");
@@ -24,28 +33,18 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/* Function to retry queued requests */
-const onRefreshed = (token) => {
-  refreshSubscribers.forEach((callback) => callback(token));
-  refreshSubscribers = [];
-};
-
-const addRefreshSubscriber = (callback) => {
-  refreshSubscribers.push(callback);
-};
-
-/* Response interceptor */
+/* RESPONSE */
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (!error || !error.config) {
+    const originalRequest = error.config;
+
+    if (!error.response) {
       return Promise.reject(error);
     }
 
-    const originalRequest = error.config;
-
     if (
-      (error.response?.status === 401 || error.response?.status === 403) &&
+      (error.response.status === 401 || error.response.status === 403) &&
       !originalRequest._retry
     ) {
       originalRequest._retry = true;
@@ -65,7 +64,7 @@ api.interceptors.response.use(
         const refreshToken = await AsyncStorage.getItem("refreshToken");
 
         if (!refreshToken) {
-          throw new Error("Refresh token not available");
+          throw new Error("No refresh token found");
         }
 
         const response = await axios.post(`${BASE_URL}/auth/refresh/`, {
@@ -73,8 +72,12 @@ api.interceptors.response.use(
         });
 
         const newAccessToken = response.data.access;
+        const newRefreshToken = response.data.refresh;
 
-        await AsyncStorage.setItem("accessToken", newAccessToken);
+        await AsyncStorage.multiSet([
+          ["accessToken", newAccessToken],
+          ["refreshToken", newRefreshToken],
+        ]);
 
         api.defaults.headers.Authorization = `Bearer ${newAccessToken}`;
 
@@ -84,9 +87,15 @@ api.interceptors.response.use(
 
         return api(originalRequest);
       } catch (err) {
-        console.log("Refresh token failed:", err.response?.data);
+        console.log("🔴 Refresh failed:", err.response?.data || err.message);
 
-        await AsyncStorage.multiRemove(["accessToken", "refreshToken"]);
+        await AsyncStorage.multiRemove([
+          "accessToken",
+          "refreshToken",
+          "userRole",
+          "userEmail",
+        ]);
+
 
         return Promise.reject(err);
       } finally {

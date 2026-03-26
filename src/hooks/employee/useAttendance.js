@@ -37,71 +37,68 @@ const getLocation = () =>
 
 
   // ---------------- Punch In ----------------
-  const handlePunchIn = async () => {
-    try {
-      if (!isFocused) return;
+const handlePunchIn = async () => {
+  try {
+    if (!isFocused) return;
 
-      console.log("➡️ Requesting foreground permission");
-      const granted = await requestForegroundLocationPermission();
-      if (!granted) {
-        console.log("❌ Permission denied");
-        return;
-      }
+    console.log("➡️ Punch In: Getting location");
 
-      console.log("➡️ Punch In: Getting location");
-      const pos = await getLocation();   
-      console.log("📍 FULL POSITION:", pos);
+    const pos = await getLocation();
+    console.log("📍 FULL POSITION:", pos);
 
-      const { latitude, longitude } = pos.coords;
-      const lat = Number(latitude.toFixed(6));
-      const lng = Number(longitude.toFixed(6));
-      const place = await getPlaceName(lat, lng).catch(() => "Unknown");
+    const { latitude, longitude } = pos.coords;
+    const lat = Number(latitude.toFixed(6));
+    const lng = Number(longitude.toFixed(6));
 
-      const res = await punchInApi({ lat, lng, place_name: place });
-      console.log("✅ PunchIn API success");
+    const place = await getPlaceName(lat, lng).catch(() => "Unknown");
 
-      setIsPunchedIn(true);
-      if (res?.punch_in_time) {
-        setPunchInTime(res.punch_in_time);
-      }
-    } catch (error) {
-      console.log("❌ Punch in error:", error);
-      throw error;
-    }
-  };
+    const res = await punchInApi({ lat, lng, place_name: place });
+
+    console.log("✅ PunchIn API success");
+
+    if (res?.punch_in_time) setPunchInTime(res.punch_in_time);
+
+    // ✅ Start tracking
+    await startLocationTracking();
+
+    setIsPunchedIn(true);
+
+  } catch (error) {
+    console.log("❌ Punch in error:", error);
+    throw error;
+  }
+};
 
   // ---------------- Punch Out ----------------
-  const handlePunchOut = async () => {
-    try {
-      console.log("➡️ Requesting foreground permission for Punch Out");
-      const granted = await requestForegroundLocationPermission();
-      if (!granted) {
-        console.log("❌ Permission denied");
-        throw new Error("Location permission denied");
-      }
+ const handlePunchOut = async () => {
+  let punchOutRes = null;
+  let errorToThrow = null;
 
-      console.log("➡️ Punch Out: Getting location");
-      const pos = await getLocation();
+  try {
+    console.log("➡️ Punch Out: Getting location");
 
-      const { latitude, longitude } = pos.coords;
-      const lat = Number(latitude.toFixed(6));
-      const lng = Number(longitude.toFixed(6));
-      const place = await getPlaceName(lat, lng).catch(() => "Unknown");
+    const pos = await getLocation();
+    const { latitude, longitude } = pos.coords;
 
-      const res = await punchOutApi({ lat, lng, place_name: place });
-      console.log("✅ PunchOut API success");
+    const lat = Number(latitude.toFixed(6));
+    const lng = Number(longitude.toFixed(6));
+    const place = await getPlaceName(lat, lng).catch(() => "Unknown");
 
-      setIsPunchedIn(false);
-      if (res?.punch_out_time) setPunchOutTime(res.punch_out_time);
-      if (res?.today_total_hours) setTodayHours(res.today_total_hours);
+    punchOutRes = await punchOutApi({ lat, lng, place_name: place });
+    console.log("✅ PunchOut API success");
+  } catch (error) {
+    console.log("❌ Punch Out Error (will still stop tracking):", error);
+    errorToThrow = error;
+  } finally {
+    await stopLocationTracking();
+    setIsPunchedIn(false);
+    if (punchOutRes?.punch_in_time) setPunchInTime(punchOutRes.punch_in_time);
+    if (punchOutRes?.punch_out_time) setPunchOutTime(punchOutRes.punch_out_time);
+    if (punchOutRes?.today_total_hours) setTodayHours(punchOutRes.today_total_hours);
+  }
 
-      await stopLocationTracking();
-
-    } catch (error) {
-      console.log("❌ Punch Out Error:", error);
-      throw error;
-    }
-  };
+  if (errorToThrow) throw errorToThrow;
+};
 
   // ---------------- Refresh Session ----------------
   const refreshSession = async () => {

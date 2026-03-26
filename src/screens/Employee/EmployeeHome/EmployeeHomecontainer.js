@@ -4,11 +4,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import EmployeeHome from "./EmployeeHome";
 import useAttendance from "../../../hooks/employee/useAttendance";
 import useEmployeeProfile from "../../../hooks/employee/useEmployeeProfile";
-import { startLocationTracking, stopLocationTracking } from "../../../services/EmployeeService/backgroundLocationService";
-import {
-  requestForegroundLocationPermission,
-  requestBackgroundLocationPermission,
-} from "../../../services/EmployeeService/permissionService";
+
+
 
 const EmployeeHomeContainer = () => {
   const [time, setTime] = useState(new Date());
@@ -18,19 +15,12 @@ const EmployeeHomeContainer = () => {
 
   const rotationValue = useRef(new Animated.Value(0)).current;
 
-  const {
-    todayHours,
-    punchInTime,
-    punchOutTime,
-    handlePunchIn,
-    handlePunchOut,
-    refreshSession,
-  } = useAttendance();
-
+  const { handlePunchIn, handlePunchOut, refreshSession } = useAttendance();
   const { profile, refetch } = useEmployeeProfile();
 
   const isPunchedIn = profile?.current_session_status === "active";
 
+  // Load user info from AsyncStorage
   useEffect(() => {
     const loadUser = async () => {
       const userData = await AsyncStorage.getItem("user");
@@ -43,12 +33,13 @@ const EmployeeHomeContainer = () => {
     loadUser();
   }, []);
 
+  // Update clock every second
   useEffect(() => {
     const interval = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(interval);
   }, []);
 
-  
+  // Animated rotation
   useEffect(() => {
     Animated.loop(
       Animated.timing(rotationValue, {
@@ -58,60 +49,48 @@ const EmployeeHomeContainer = () => {
         useNativeDriver: true,
       })
     ).start();
-  }, []);
+  }, [rotationValue]);
 
-  
-const handleCheck = async () => {
-  try {
-    console.log("STEP 1: Button clicked");
+  // Handle punch in/out
+  const handleCheck = async () => {
+    try {
+      console.log("STEP 1: Button clicked");
 
-    if (isPunchedIn) {
-      await handlePunchOut();
-      // ensure stopLocationTracking is available and stop background tracking
-      await stopLocationTracking();
-    } else {
-      console.log("STEP 2: Punch IN");
-
-      const granted = await requestForegroundLocationPermission();
-
-      if (!granted) {
-        console.log("❌ Permission denied");
-        return;
+      if (isPunchedIn) {
+        await handlePunchOut();
+      } else {
+        await handlePunchIn();
       }
 
-      console.log("✅ Permission granted");
-
-      await handlePunchIn();
-      console.log("STEP 3: PunchIn API done");
-
-      // Request background location permission on Android before starting persistent tracking
-      try {
-        const bgGranted = await requestBackgroundLocationPermission();
-        if (!bgGranted) {
-          console.log("⚠️ Background permission not granted — tracking may stop when app is backgrounded");
-        }
-      } catch (permErr) {
-        console.log("Background permission check failed:", permErr);
-      }
-
-      await startLocationTracking();
-      console.log("STEP 4: Tracking started");
+      await refreshSession();
+      await refetch();
+    } catch (error) {
+      console.log("❌ Punch error:", error);
     }
+  };
 
-    await refreshSession();
-    await refetch();
-
-  } catch (error) {
-    console.log("❌ Punch error:", error);
-  }
-};
-
+  // Refresh handler
   const onRefresh = async () => {
     setRefreshing(true);
     await refreshSession();
     await refetch();
     setRefreshing(false);
   };
+
+  // Map attendance data from profile
+  const punchInTime = profile?.today_attendance?.first_punch_in || null;
+  const punchOutTime = profile?.today_attendance?.last_punch_out || null;
+
+  // Calculate total hours if missing
+  let todayHours = profile?.today_attendance?.total_work_hours;
+  if (!todayHours && punchInTime) {
+    const inTime = new Date(punchInTime);
+    const outTime = punchOutTime ? new Date(punchOutTime) : new Date();
+    const diffMs = outTime - inTime;
+    const diffHrs = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffMins = Math.floor((diffMs / (1000 * 60)) % 60);
+    todayHours = `${diffHrs}h ${diffMins}m`;
+  }
 
   return (
     <EmployeeHome

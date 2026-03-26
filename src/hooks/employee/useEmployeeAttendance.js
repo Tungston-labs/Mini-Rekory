@@ -10,11 +10,13 @@ const useEmployeeAttendance = (month, year) => {
     setLoading(true);
     setError(null);
 
-    try {
+     try {
       const data = await getEmployeeAttendance({ month, year });
-      setAttendance(data);
+      setAttendance(data || []);
     } catch (err) {
-      setError(err);
+      console.log("Attendance fetch error:", err.response?.data || err.message);
+      setError(err.response?.data || err.message || "Unknown error");
+      setAttendance([]);
     } finally {
       setLoading(false);
     }

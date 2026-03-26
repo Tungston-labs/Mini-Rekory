@@ -11,6 +11,7 @@
     <!-- FOREGROUND SERVICE -->
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_LOCATION"/>
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"/>
 
     <!-- NETWORK -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
@@ -29,7 +30,10 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         android:supportsRtl="true">
-
+<service
+    android:name="com.transistorsoft.rnbackgroundfetch.HeadlessTask"
+    android:permission="android.permission.BIND_JOB_SERVICE"
+    android:exported="true" />
         <!-- Foreground Service -->
         <service
             android:name="com.supersami.foregroundservice.ForegroundService"

@@ -38,13 +38,18 @@ const handleLogin = async () => {
 
     const user = res.data.user;
 
-    await AsyncStorage.setItem("accessToken", res.data.access);
-    await AsyncStorage.setItem("refreshToken", res.data.refresh);
+    // ✅ Save user (optional)
+    await AsyncStorage.setItem("user", JSON.stringify(user));
 
+    console.log("USER SAVED:", user);
 
-await AsyncStorage.setItem("user", JSON.stringify(user));
-console.log("USER SAVED:", user);
-    await login(user.role, user.email);
+    // ✅ IMPORTANT: pass tokens to login
+    await login(
+      user.role,
+      user.email,
+      res.data.access,
+      res.data.refresh
+    );
 
     Alert.alert("Success", `Welcome ${user.name}`);
 
