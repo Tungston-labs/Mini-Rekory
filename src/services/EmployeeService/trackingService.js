@@ -49,8 +49,18 @@ export const getLocation = () => {
 // ===============================
 // SEND LOCATION (API LAYER)
 // ===============================
+let lastSentTime = 0;
+
 const sendLocationToServer = async (coords) => {
   try {
+    const now = Date.now();
+
+    // ✅ BLOCK if within 1 minute
+    if (now - lastSentTime < 60000) {
+      console.log("⏳ Skipping - sent recently");
+      return;
+    }
+
     const sessionId = await AsyncStorage.getItem("sessionId");
 
     if (!sessionId) {
@@ -58,7 +68,6 @@ const sendLocationToServer = async (coords) => {
       return;
     }
 
-    // ✅ FIX HERE (IMPORTANT)
     const lat = Number(coords.latitude.toFixed(6));
     const lng = Number(coords.longitude.toFixed(6));
 
@@ -73,7 +82,11 @@ const sendLocationToServer = async (coords) => {
 
     const res = await locationUpdateApi(payload);
 
+    // ✅ update last sent time ONLY on success
+    lastSentTime = now;
+
     console.log("📍 Location sent:", res);
+
   } catch (err) {
     console.log("❌ Location API error:", err?.response?.data || err.message);
   }
@@ -102,7 +115,7 @@ export const startTracking = async () => {
     } catch (err) {
       console.log("❌ Tracking error:", err);
     }
-  }, 30000); 
+  }, 120000); 
 
   console.log("🚀 Tracking started");
 };
