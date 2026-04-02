@@ -5,378 +5,246 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { locationUpdateApi } from "./attendanceService";
 import { getPlaceName } from "./locationService";
 
-let trackingActive = false;
-let backgroundFetchConfigured = false;
-let startPromise = null;
-let stopPromise = null;
-
-const FOREGROUND_SERVICE_ID = 144;
-const LOCATION_TASK_ID = "attendance-location-update-task";
-const LOCATION_SEND_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes (min spacing between API sends)
-const FOREGROUND_TICK_INTERVAL_MS = 60 * 1000; // 1 minute tick to reduce scheduler/Doze drift
-const DEBUG_ATTENDANCE_LOGS = true;
-const TRACKING_ACTIVE_KEY = "attendance_tracking_active_v1";
-const BACKGROUND_FETCH_MIN_INTERVAL_MINUTES = 20;
-const LAST_ATTEMPT_KEY = "attendance_last_location_attempt_at_v1";
-const LAST_SUCCESS_KEY = "attendance_last_location_success_at_v1";
-const LAST_TICK_KEY = "attendance_last_foreground_tick_at_v1";
-const LAST_ERROR_KEY = "attendance_last_location_error_v1";
-const LAST_LOCATION_KEY = "attendance_last_location_v1";
-
-// ============================
+// ========================================
 // FOREGROUND SERVICE
-// ============================
+// ========================================
 
-const setTrackingActive = async (active) => {
-  trackingActive = active;
-  await AsyncStorage.setItem(
-    TRACKING_ACTIVE_KEY,
-    active ? "true" : "false"
-  );
-};
-
-const isTrackingActive = async () => {
-  if (trackingActive) return true;
-  try {
-    const v = await AsyncStorage.getItem(TRACKING_ACTIVE_KEY);
-    return v === "true";
-  } catch {
-    return false;
-  }
-};
-
-const ensureForegroundServiceStarted = async () => {
-  if (ReactNativeForegroundService.is_running()) return;
-
+const startForegroundService = async () => {
+  console.log("🚀 Foreground Service Started");
   await ReactNativeForegroundService.start({
-    id: FOREGROUND_SERVICE_ID,
-    title: "Attendance Tracking",
-    message: "Tracking your location...",
+    id: 1001, title: "Location Tracking",
+    message: "Fetching your location...",
+    icon: "ic_launcher",
     ServiceType: "location",
   });
 };
 
 const stopForegroundService = async () => {
+  console.log("🛑 Foreground Service Stopped");
   await ReactNativeForegroundService.stop();
 };
 
-// ============================
-// GET LOCATION
-// ============================
+// ❌ DO NOT STOP frequently (only when user stops tracking)
 
-const getLocation = () => {
-  // Some Android OEMs/Doze modes can cause getCurrentPosition to hang even
-  // if `timeout` is provided; wrap it to guarantee resolution.
-  const locationPromise = new Promise((resolve, reject) => {
+// ========================================
+// GET LOCATION
+// ========================================
+
+export const getLocation = () => {
+  return new Promise((resolve, reject) => {
     Geolocation.getCurrentPosition(
-      resolve,
-      reject,
+      position => resolve(position),
+      error => reject(error),
       {
         enableHighAccuracy: true,
-        timeout: 30000,
-        // Prefer somewhat fresh fixes; under Doze a strict 0 can cause long waits.
-        maximumAge: 15000,
+        timeout: 15000,
+        maximumAge: 10000,
         forceRequestLocation: true,
-      }
-    );
+      });
   });
-
-  const hardTimeoutMs = 35000;
-  const timeoutPromise = new Promise((_, reject) => {
-    setTimeout(() => reject(new Error("getCurrentPosition hard timeout")), hardTimeoutMs);
-  });
-
-  return Promise.race([locationPromise, timeoutPromise]);
 };
 
-// ============================
+// ========================================
 // SEND LOCATION
-// ============================
+// ========================================
 
-const sendLocation = async ({ source = "unknown" } = {}) => {
+const sendLocationToServer = async (coords) => {
   try {
-    const activeBefore = await isTrackingActive();
-    if (!activeBefore) {
-      console.log(`⏭️ sendLocation skipped (inactive): ${source}`);
-      return false;
+    const lastTime = await AsyncStorage.getItem("lastLocationTime");
+    const now = Date.now();
+
+    if (lastTime && now - Number(lastTime) < 60 * 1000) {
+      console.log("⏳ Skipped (within 1 min)");
+      return;
     }
 
-    if (source === "foreground") {
-      await AsyncStorage.setItem(LAST_TICK_KEY, Date.now().toString());
+    const sessionId = await AsyncStorage.getItem("sessionId");
 
-      // Only send to API once every ~10 minutes.
-      const lastAttemptAt = await AsyncStorage.getItem(LAST_ATTEMPT_KEY);
-      const lastAttemptMs = lastAttemptAt ? Number(lastAttemptAt) : null;
-      const nowMs = Date.now();
-      if (lastAttemptMs && nowMs - lastAttemptMs < LOCATION_SEND_INTERVAL_MS) {
-        console.log("⏭️ sendLocation suppressed (min interval not reached)");
-        return false;
-      }
-    }
+    const lat = coords.latitude.toFixed(6).toString();
+    const lng = coords.longitude.toFixed(6).toString();
 
-    await AsyncStorage.setItem(LAST_ATTEMPT_KEY, Date.now().toString());
-    console.log(`📡 sendLocation start: ${source}`);
-    const position = await getLocation();
-    if (DEBUG_ATTENDANCE_LOGS) {
-      console.log("📍 getLocation response:", position);
-    }
+    const placeName = `Lat: ${lat}, Lng: ${lng}`;
 
-    // Avoid sending if user has punched out while geolocation was in-flight.
-    const activeAfter = await isTrackingActive();
-    if (!activeAfter) {
-      console.log(`⏭️ sendLocation aborted (became inactive): ${source}`);
-      return false;
-    }
-
-    const { latitude, longitude, accuracy } = position.coords;
-
-    const lat = Number(latitude.toFixed(6));
-    const lng = Number(longitude.toFixed(6));
-
-    let place = "Unknown";
-    try {
-      place = await getPlaceName(lat, lng);
-    } catch (error) {
-      console.log("❌ Failed reverse geocode:", error);
-    }
-    if (DEBUG_ATTENDANCE_LOGS) {
-      console.log("📍 place_name result:", place);
-    }
-
-    const apiRes = await locationUpdateApi({
+    await locationUpdateApi({
       lat,
       lng,
-      place_name: place,
-      accuracy,
+      place_name: placeName,
+      session_id: sessionId,
     });
-    if (DEBUG_ATTENDANCE_LOGS) {
-      console.log("🌐 locationUpdateApi response:", apiRes);
-    }
 
-    await AsyncStorage.setItem(LAST_SUCCESS_KEY, Date.now().toString());
-    await AsyncStorage.setItem(
-      LAST_LOCATION_KEY,
-      JSON.stringify({ lat, lng, place_name: place })
-    );
-    console.log(`✅ Location sent (${source}):`, { lat, lng });
-    return true;
+    await AsyncStorage.setItem("lastLocationTime", now.toString());
 
-  } catch (error) {
-    const status = error?.response?.status ?? null;
-    const message = error?.message ?? String(error);
-    await AsyncStorage.setItem(
-      LAST_ERROR_KEY,
-      JSON.stringify({ at: Date.now(), status, message })
-    );
-    console.log("❌ Location error:", error);
-    return false;
+    console.log("✅ Sent:", lat, lng, placeName);
+  } catch (err) {
+    console.log("❌ API ERROR:", err?.response?.data || err.message);
   }
 };
 
-// ============================
-// 🔥 FOREGROUND LOOP (10 MIN)
-// ============================
 
-const startForegroundLoop = async () => {
-  // Register the JS task before starting the service.
-  // This avoids cases where the task isn't picked up by the running JS context.
+// ======================================== 
+// // IMMEDIATE LOCATION 
+// // ======================================== 
+
+export const sendImmediateLocation = async () => {
   try {
-    if (ReactNativeForegroundService.is_task_running(LOCATION_TASK_ID)) {
-      ReactNativeForegroundService.remove_task(LOCATION_TASK_ID);
-    }
-  } catch (e) {
-    // ignore
+    const position = await getLocation();
+
+    console.log("📍 Immediate location:", position.coords);
+
+    await sendLocationToServer(position.coords);
+
+  } catch (err) {
+    console.log("❌ Immediate location error:", err);
+  }
+};
+// ========================================
+// START TRACKING
+// ========================================
+
+export const startTracking = async () => {
+  console.log("🚀 Tracking STARTED");
+
+  const isRunning = await ReactNativeForegroundService.is_running();
+  console.log("service running:", isRunning);
+  if (isRunning) {
+    console.log("⚠️ Service already running");
+    return;
   }
 
-  console.log("➕ Registering foreground location task (10 min loop)");
+  await ReactNativeForegroundService.start({
+    id: 1001,
+    title: "Location Tracking",
+    message: "Tracking your location...",
+    icon: "ic_launcher",
+    ServiceType: "location",
+  });
+
+  ReactNativeForegroundService.remove_task("location-task");
 
   ReactNativeForegroundService.add_task(
     async () => {
-      console.log("📍 Foreground service tick");
-      await sendLocation({ source: "foreground" });
-    },
-    {
-      delay: FOREGROUND_TICK_INTERVAL_MS,
-      onLoop: true,
-      taskId: LOCATION_TASK_ID,
-      onError: (e) => console.log("❌ Foreground task error:", e),
-    }
-  );
+      console.log("⏱️ 15 MIN TASK TRIGGERED");
 
-  await ensureForegroundServiceStarted();
-
-  // Run immediately after punch-in.
-  await sendLocation({ source: "foreground_start" });
-};
-
-const stopForegroundLoop = async () => {
-  try {
-    if (ReactNativeForegroundService.is_task_running(LOCATION_TASK_ID)) {
-      ReactNativeForegroundService.remove_task(LOCATION_TASK_ID);
-    }
-  } catch (e) {
-    console.log("⚠️ remove_task failed:", e);
-  }
-
-  try {
-    await stopForegroundService();
-  } catch (e) {
-    console.log("⚠️ stopForegroundService failed:", e);
-  }
-
-  try {
-    ReactNativeForegroundService.remove_all_tasks();
-  } catch {
-    // ignore
-  }
-};
-
-// ============================
-// 🔥 BACKGROUND FETCH (FALLBACK)
-// ============================
-
-const initBackgroundFetch = async () => {
-  if (backgroundFetchConfigured) return;
-  backgroundFetchConfigured = true;
-
-  await BackgroundFetch.configure(
-    {
-      minimumFetchInterval: BACKGROUND_FETCH_MIN_INTERVAL_MINUTES,
-      stopOnTerminate: false,
-      startOnBoot: true,
-      enableHeadless: true,
-      forceAlarmManager: true,
-    },
-    async (taskId) => {
       try {
-        const active = await isTrackingActive();
-        if (!active) return;
-
-        // Foreground service is the main mechanism; only send when it is not running.
-        if (ReactNativeForegroundService.is_running()) return;
-
-        await sendLocation({ source: "backgroundfetch" });
+        const position = await getLocation();
+        await sendLocationToServer(position.coords);
       } catch (err) {
-        console.log("❌ BackgroundFetch task error:", err);
-      } finally {
-        BackgroundFetch.finish(taskId);
+        console.log("❌ Interval error:", err);
       }
     },
-    (error) => {
-      console.log("❌ BackgroundFetch error:", error);
+    {
+      delay: 5 * 60 * 1000,
+      onLoop: true,
+      taskId: "location-task",
+      onError: (e) => console.log("TASK ERROR:", e),
     }
   );
+
+  // ✅ ONLY ONE immediate call here
+  await sendImmediateLocation();
+
+  // ✅ Start background fetch as backup
+  // await BackgroundFetch.start();
 };
 
-// ============================
-// HEADLESS (KILLED STATE)
-// ============================
+// ========================================
+// STOP TRACKING
+// ========================================
 
-export const backgroundFetchHeadlessTask = async (event) => {
-  const taskId = event.taskId;
+export const stopTracking = async () => {
+  console.log("🛑 Tracking STOPPED");
 
-  try {
-    const active = await isTrackingActive();
-    if (!active) return;
+  ReactNativeForegroundService.remove_task("location-task");
 
-    if (ReactNativeForegroundService.is_running()) return;
+  await ReactNativeForegroundService.stop();
+  await BackgroundFetch.stop();
+};
 
-    console.log("🔥 Headless running:", taskId);
-    await sendLocation({ source: "headless" });
-  } catch (e) {
-    console.log("❌ Headless error:", e);
-  } finally {
-    BackgroundFetch.finish(taskId);
+
+// ========================================
+//  // DESTROY TRACKING // 
+// ======================================== 
+
+export const destroyTracking = async () => {
+  await BackgroundFetch.stop();
+};
+
+// ========================================
+// BACKGROUND FETCH
+// ========================================
+
+let isBgFetchInitialized = false;
+
+export const initLocationTracking = async () => {
+  if (isBgFetchInitialized) {
+    console.log("⚠️ BackgroundFetch already initialized");
+    return;
   }
-};
 
-// ============================
-// PUBLIC START / STOP
-// ============================
+  isBgFetchInitialized = true;
 
-export const startLocationTracking = async () => {
-  if (trackingActive) return;
-  if (startPromise) return startPromise;
-
-  startPromise = (async () => {
-    await setTrackingActive(true);
-    try {
-      await startForegroundLoop();
-
-      // If the user punched out mid-start, don't start background-fetch.
-      const activeNow = await isTrackingActive();
-      if (!activeNow) return;
-
-      await initBackgroundFetch();
-      await BackgroundFetch.start();
-      console.log("✅ Hybrid tracking started");
-    } catch (e) {
-      await setTrackingActive(false);
-      throw e;
-    }
-  })().finally(() => {
-    startPromise = null;
-  });
-
-  return startPromise;
-};
-
-export const stopLocationTracking = async () => {
-  if (stopPromise) return stopPromise;
-
-  stopPromise = (async () => {
-    // Always clear persisted flag, even if JS state was lost.
-    await setTrackingActive(false);
-
-    await stopForegroundLoop();
-
-    try {
-      await BackgroundFetch.stop();
-    } catch (e) {
-      console.log("⚠️ BackgroundFetch.stop failed:", e);
-    }
-
-    console.log("🛑 Tracking stopped");
-  })().finally(() => {
-    stopPromise = null;
-  });
-
-  return stopPromise;
-};
-
-export const sendImmediateLocation = async () => {
-  await sendLocation({ source: "manual" });
-};
-
-// Called on app start to resume tracking if the user was already punched in
-// before the app was restarted.
-export const resumeLocationTrackingIfNeeded = async () => {
   try {
-    const active = await AsyncStorage.getItem(TRACKING_ACTIVE_KEY);
-    if (active === "true") {
-      await startLocationTracking();
-    }
-  } catch (e) {
-    console.log("⚠️ resumeLocationTrackingIfNeeded failed:", e);
-  }
-};
+    const status = await BackgroundFetch.configure(
+      {
+        minimumFetchInterval: 15,
+        stopOnTerminate: false,
+        startOnBoot: true,
+        enableHeadless: true,
+        requiredNetworkType: BackgroundFetch.NETWORK_TYPE_ANY,
+         forceAlarmManager: true,
+      },
+      async (taskId) => {
+        console.log("🔥 Background fetch triggered");
 
-export const getLastTrackingMarkers = async () => {
-  try {
-    const [attemptAt, successAt, lastError, lastLocation] = await Promise.all([
-      AsyncStorage.getItem(LAST_ATTEMPT_KEY),
-      AsyncStorage.getItem(LAST_SUCCESS_KEY),
-      AsyncStorage.getItem(LAST_ERROR_KEY),
-      AsyncStorage.getItem(LAST_LOCATION_KEY),
-    ]);
+        try {
+          const sessionId = await AsyncStorage.getItem("sessionId");
 
-    return {
-      attemptAt: attemptAt ? Number(attemptAt) : null,
-      successAt: successAt ? Number(successAt) : null,
-      lastError: lastError ? JSON.parse(lastError) : null,
-      lastLocation: lastLocation ? JSON.parse(lastLocation) : null,
-    };
+          if (!sessionId) {
+            console.log("❌ No session, skipping...");
+            BackgroundFetch.finish(taskId);
+            return;
+          }
+
+          const position = await getLocation();
+
+          const lat = position.coords.latitude.toFixed(6).toString();
+          const lng = position.coords.longitude.toFixed(6).toString();
+          const placeName = lat && lng
+            ? `Lat: ${lat}, Lng: ${lng}`
+            : "Unknown Location";
+
+          console.log("📦 BG PAYLOAD:", {
+            lat,
+            lng,
+            place_name: placeName,
+            session_id: sessionId,
+          });
+
+          await locationUpdateApi({
+            lat,
+            lng,
+            place_name: placeName,
+            session_id: sessionId,
+          });
+
+          console.log("✅ BG Sent:", lat, lng);
+
+        } catch (e) {
+          console.log("❌ BG error:", e);
+        } finally {
+          BackgroundFetch.finish(taskId);
+        }
+      },
+      (error) => {
+        console.log("❌ CONFIG ERROR:", error);
+      }
+    );
+
+    await BackgroundFetch.start();
+
+    console.log("✅ BackgroundFetch started:", status);
+
   } catch (e) {
-    return { attemptAt: null, successAt: null, lastError: null, lastLocation: null };
+    console.log("❌ INIT ERROR:", e);
   }
 };

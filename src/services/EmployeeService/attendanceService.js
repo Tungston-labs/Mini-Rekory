@@ -6,8 +6,21 @@ export const punchInApi = async (data) => {
 };
 
 export const locationUpdateApi = async (data) => {
-  const res = await api.post("/attendance/sessions/location-update/", data);
-  return res.data;
+  try {
+    console.log(data)
+    const res = await api.post(
+      "/attendance/sessions/location-update/",
+      data
+    );
+
+    console.log("📥 API SUCCESS:", res.data);
+
+    return res.data;
+
+  } catch (err) {
+    console.log("❌ API FAILED:", err?.response?.data || err.message);
+    throw err;
+  }
 };
 
 export const punchOutApi = async (data) => {
