@@ -684,9 +684,9 @@ console.log("🚀 Checked In");
 
     const lat = Number(position.coords.latitude.toFixed(6));
     const lng = Number(position.coords.longitude.toFixed(6));
-    const place_name = await getPlaceName(lat, lng);
+    // const place_name = await getPlaceName(lat, lng);
 
-    return { lat, lng, place_name };
+    return { lat, lng, };
   };
 
   const requestLocationPermission = async () => {

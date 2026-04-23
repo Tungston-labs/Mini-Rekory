@@ -75,7 +75,7 @@ const sendLocationToServer = async (coords) => {
       session_id: sessionId,
       lat,
       lng,
-      place_name: `Lat: ${lat}, Lng: ${lng}`,
+      // place_name: `Lat: ${lat}, Lng: ${lng}`,
     };
 
     console.log("📍 Sending payload:", payload);

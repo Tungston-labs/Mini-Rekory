@@ -42,6 +42,7 @@ useEffect(() => {
       : "OffLine",
     time: "Live",
     status: emp.is_active_now ? "active" : "inactive",
+        profile_pic: emp.profile_pic,
   })) || [];
 
   console.log("LIVE EMPLOYEES API:", liveEmployees);

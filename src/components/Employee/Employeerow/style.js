@@ -6,7 +6,7 @@ export default StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFF",
     padding: 10,
-    borderRadius: 16,
+    // borderRadius: 16,
     // marginBottom: 12,
   },
   avatar: {
@@ -16,7 +16,7 @@ export default StyleSheet.create({
   },
   info: {
     flex: 1,
-    marginLeft: 20,
+    marginLeft: 10,
   },
   name: {
     fontSize: 16,
@@ -26,11 +26,12 @@ export default StyleSheet.create({
   location: {
     flexDirection: "row",
     alignItems: "center",
+    // backgroundColor:"red"
 
   },
   locationText: {
     fontSize: 12,
-    marginLeft: 4,
+    // marginLeft:,
     fontFamily: "PoppinsRegular",
   },
   right: {
@@ -62,4 +63,12 @@ export default StyleSheet.create({
     fontFamily: "PoppinsRegular",             
   },
   
+  avatarFallback: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  backgroundColor: "#E0E0E0",
+  justifyContent: "center",
+  alignItems: "center",
+},
 });

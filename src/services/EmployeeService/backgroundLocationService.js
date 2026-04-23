@@ -63,12 +63,12 @@ const sendLocationToServer = async (coords) => {
     const lat = coords.latitude.toFixed(6).toString();
     const lng = coords.longitude.toFixed(6).toString();
 
-    const placeName = `Lat: ${lat}, Lng: ${lng}`;
+    // const placeName = `Lat: ${lat}, Lng: ${lng}`;
 
     await locationUpdateApi({
       lat,
       lng,
-      place_name: placeName,
+      // place_name: placeName,
       session_id: sessionId,
     });
 
@@ -216,14 +216,14 @@ export const initLocationTracking = async () => {
           console.log("📦 BG PAYLOAD:", {
             lat,
             lng,
-            place_name: placeName,
+            // place_name: placeName,
             session_id: sessionId,
           });
 
           await locationUpdateApi({
             lat,
             lng,
-            place_name: placeName,
+            // place_name: placeName,
             session_id: sessionId,
           });
 

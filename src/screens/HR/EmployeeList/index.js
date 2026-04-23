@@ -31,7 +31,10 @@ const EmployeesScreen = () => {
     isFetchingNextPage,
   } = useLiveEmployees(debouncedSearch, filter);
 
-const employees = data?.pages.flatMap((page) => page.results) || [];
+  const employees =
+    data?.pages
+      ?.flatMap((page) => page?.employees || [])
+      ?.filter((item) => item && item.id) || [];
 
   const onRefresh = useCallback(async () => {
     setRefreshing(true);

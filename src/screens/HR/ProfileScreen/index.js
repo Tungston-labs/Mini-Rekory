@@ -1,38 +1,62 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, Image, TouchableOpacity, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
+
 import InfoCard from "../../../components/Profile";
 import EmployeeSkeleton from "../../../components/EmployeeSkeleton";
-import { RefreshControl } from "react-native";
+
 import { useAuth } from "../../../context/AuthContext";
+import { getCompanyProfile } from "../../../services/HrServices/profileService";
+
 const ProfileScreen = () => {
+  const [refreshing, setRefreshing] = useState(false);
+  const [profile, setProfile] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isError, setIsError] = useState(false);
-const [refreshing, setRefreshing] = useState(false);
-const { logout } = useAuth();
- const handleLogout = async () => {
-  await logout();
-};
-const onRefresh = () => {
-  setRefreshing(true);
-  setIsLoading(true);
 
-  setTimeout(() => {
-    setIsLoading(false);
-    setRefreshing(false);
-  }, 1500);
-};
+  const { logout } = useAuth();
 
-  useEffect(() => {
-    const timer = setTimeout(() => {
+  // ✅ FETCH API
+  const fetchProfile = async () => {
+    try {
+      setIsError(false);
+      const data = await getCompanyProfile();
+      setProfile(data);
+    } catch (error) {
+      console.log("PROFILE ERROR:", error);
+      setIsError(true);
+    } finally {
       setIsLoading(false);
-      setIsError(false); 
-    }, 1500);
+    }
+  };
 
-    return () => clearTimeout(timer);
+  // ✅ INITIAL LOAD
+  useEffect(() => {
+    fetchProfile();
   }, []);
 
+  // ✅ REFRESH
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await fetchProfile();
+    setRefreshing(false);
+  };
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const company = profile || {};
+
+  // ✅ LOADING UI
   if (isLoading) {
     return (
       <SafeAreaView style={{ flex: 1, padding: 16 }}>
@@ -43,72 +67,102 @@ const onRefresh = () => {
     );
   }
 
+  // ✅ ERROR UI
   if (isError) {
     return (
       <SafeAreaView
         style={{ flex: 1, justifyContent: "center", alignItems: "center" }}
       >
         <Text>Failed to load profile</Text>
+
+        <TouchableOpacity
+          onPress={fetchProfile}
+          style={{
+            marginTop: 10,
+            padding: 10,
+            backgroundColor: "#2B7CD6",
+            borderRadius: 8,
+          }}
+        >
+          <Text style={{ color: "#fff" }}>Retry</Text>
+        </TouchableOpacity>
       </SafeAreaView>
     );
   }
+const logoUrl = company?.logo
+  ? company.logo
+  : "https://via.placeholder.com/150";
 
   return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }}>
-   <ScrollView
-          contentContainerStyle={styles.container}
-          refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-          }
-          >
-      <View style={styles.header} />
+    <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }}>
+      <ScrollView
+        contentContainerStyle={styles.container}
+        refreshControl={
+          <RefreshControl
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
+      >
+        <View style={styles.header} />
 
-      <View style={styles.profileWrapper}>
-        <Image
-          source={{ uri: "https://i.pravatar.cc/300" }}
-          style={styles.profileImage}
-        />
-        <Text style={styles.name}>Arjun S</Text>
-        <Text style={styles.role}>UIUX Designer</Text>
-      </View>
+        {/* Profile */}
+        <View style={styles.profileWrapper}>
+          <Image source={{ uri: logoUrl }} 
+          style={styles.profileImage} />
+          <Text style={styles.name}>
+            {company.company_name || "N/A"}
+          </Text>
+          <Text style={styles.role}>Company</Text>
+        </View>
 
-      <InfoCard title="Work Information">
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Full Name</Text>
-          <Text style={styles.value}>Arjun S</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Job Title</Text>
-          <Text style={styles.value}>UIUX Designer</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Department</Text>
-          <Text style={styles.value}>Design</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Email</Text>
-          <Text style={styles.value}>arjuns@gmail.com</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.label}>Phone</Text>
-          <Text style={styles.value}>9521322200</Text>
-        </View>
-      </InfoCard>
+        {/* Info */}
+        <InfoCard title="Company Information">
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Company Name</Text>
+            <Text style={styles.value}>
+              {company.company_name || "N/A"}
+            </Text>
+          </View>
 
-      <TouchableOpacity style={styles.TermsButton}>
-        <Text style={styles.PolicyText}>Terms & Conditions</Text>
-      </TouchableOpacity>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Email</Text>
+            <Text style={styles.value}>
+              {company.email || "N/A"}
+            </Text>
+          </View>
 
-      <TouchableOpacity style={styles.PolicyButton}>
-        <Text style={styles.PolicyText}>Privacy Policy</Text>
-      </TouchableOpacity>
-<TouchableOpacity
-  style={styles.logoutButton}
-  onPress={handleLogout}
->
-  <Text style={styles.logoutText}>Log Out</Text>
-</TouchableOpacity>
-    </ScrollView>
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.value}>
+              {company.contact_number || "N/A"}
+            </Text>
+          </View>
+
+          <View style={styles.infoRow}>
+            <Text style={styles.label}>Registration Date</Text>
+            <Text style={styles.value}>
+              {company.registration_date || "N/A"}
+            </Text>
+          </View>
+        </InfoCard>
+
+        {/* Buttons */}
+        <TouchableOpacity style={styles.TermsButton}>
+          <Text style={styles.PolicyText}>Terms & Conditions</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.PolicyButton}>
+          <Text style={styles.PolicyText}>Privacy Policy</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
+          <Text style={styles.logoutText}>Log Out</Text>
+        </TouchableOpacity>
+      </ScrollView>
     </SafeAreaView>
   );
 };

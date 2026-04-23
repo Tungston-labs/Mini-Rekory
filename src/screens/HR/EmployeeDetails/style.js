@@ -20,92 +20,70 @@ export default StyleSheet.create({
     },
 
 
-    profileCard: {
-        borderRadius: 16,
-        padding: 10,
-        margin: 15,
-        flexDirection: "row",
-        // alignItems: "center",
-        borderWidth: 1,
-        borderColor: "rgba(0, 0, 0, 0.1)",
-        backgroundColor: "white",
-    
-    },
+ profileCard: {
+  borderRadius: 16,
+  padding: 10,
+  margin: 10,
+  borderWidth: 1,
+  borderColor: "rgba(0,0,0,0.1)",
+  backgroundColor:"white"
+},
 
+topRow: {
+  flexDirection: "row",
+  alignItems: "center",
 
-    backBtn: {
-        width: 32,
-        height: 32,
-        // alignItems: "center",
-        // justifyContent: "center",
-        // marginRight: 8,
-    },
+},
 
-    userRow: {
-        flex: 1,
-        flexDirection: "row",
-        // alignItems: "center",
-    },
+backBtn: {
+//   width: 35,
+//   height: 35,
+  alignItems: "center",
+  justifyContent: "center",
+},
 
-    avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 24,
-        marginRight: 10,
-    },
+avatar: {
+  width: 40,
+  height: 40,
+  borderRadius: 25,
+  marginLeft: 10,
+},
 
-    profileInfo: {
-        flex: 1,
-        justifyContent: "center",
-    },
+callBtn: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: "#16B759",
+  alignItems: "center",
+  justifyContent: "center",
+},
 
-    name: {
-        fontSize: 14,
-        fontWeight: "600",
-        marginBottom: 4,
-    },
+profileInfo: {
+  marginTop: 8,
+},
 
-    infoRow: {
-        flexDirection: "row",
-        alignItems: "center",
-        marginBottom: 2,
-    },
-
-    label: {
-        width: 80,
-        fontSize: 12,
-        color: "#414141",
-        fontFamily: "Poppins",
-        fontWeight: "400",
-    },
-
-    colon: {
-        width: 10,
-        fontSize: 14,
-        color: "#414141",
-    },
-
-    value: {
-        flex: 1,
-        fontSize: 13,
-        color: "#414141",
-        fontFamily: "Poppins",
-        fontWeight: "400",
-    },
-    callBtn: {
-        width: 40,
-        height: 40,
-        borderRadius: 50,
-        backgroundColor: "#16B759",
-        alignItems: "center",
-        justifyContent: "center",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 24 },
-        shadowOpacity: 0.24,
-        shadowRadius: 16,
-        elevation: 15,
-    },
-
+name: {
+  fontSize: 16,
+  fontWeight: "600",
+  marginBottom: 8,
+},
+infoRow: { 
+    flexDirection: "row",
+     alignItems: "center",
+      marginBottom: 2,
+     },
+ label: { 
+    width: 80, 
+    fontSize: 12,
+     color: "#414141", 
+     fontFamily: "Poppins",
+      fontWeight: "400",
+     },
+ colon: { 
+    width: 10,
+     fontSize: 14,
+      color: "#414141",
+     },
     locationCard: {
         backgroundColor: "#fff",
         borderTopLeftRadius: 32,
@@ -224,5 +202,13 @@ export default StyleSheet.create({
         alignItems: "center",
         height:120
     }
-
+,
+    avatarFallback: {
+  width: 45,
+  height: 45,
+  borderRadius: 40,
+  backgroundColor: "#EAEAEA",
+  alignItems: "center",
+  justifyContent: "center",
+},
 });

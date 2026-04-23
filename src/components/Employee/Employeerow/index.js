@@ -1,24 +1,30 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { MapPin ,CaretRight } from "phosphor-react-native";
+import { MapPin ,CaretRight,User } from "phosphor-react-native";
 import styles from "./style";
 
-const EmployeeRow = ({ name, location, status ,onPress }) => {
-const active = status === "Active";
+const EmployeeRow = ({ name, location, status ,onPress ,profile_pic, first_punch_in}) => {
+const active = status === true;
 
   return (
     <TouchableOpacity style={styles.row} onPress={onPress}>
-      <Image
-        source={{ uri: "https://i.pravatar.cc/150" }}
-        style={styles.avatar}
-      />
+ {profile_pic ? (
+  <Image
+    source={{ uri: profile_pic }}
+    style={styles.avatar}
+  />
+) : (
+  <View style={styles.avatarFallback}>
+    <User size={28} color="#555" />
+  </View>
+)}
 
       <View style={styles.info}>
         <Text style={styles.name}>{name}</Text>
 
         <View style={styles.location}>
-          <MapPin size={17} color="#E53935" />
-          <Text style={styles.locationText}>{location}</Text>
+          <MapPin size={18} color="#E53935" />
+          <Text style={styles.locationText}> {location || "Offline"}</Text>
         </View>
       </View>
 
@@ -30,7 +36,7 @@ const active = status === "Active";
     ]}
   />
  <View style={styles.timeRow}>
-  <Text style={styles.time}>09:18 AM</Text>
+  <Text style={styles.time}>{first_punch_in || "---"}</Text>
   <CaretRight size={20}  weight="bold" />
 </View>
 </View>

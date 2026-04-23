@@ -50,9 +50,9 @@ const handlePunchIn = async () => {
     const lat = Number(latitude.toFixed(6));
     const lng = Number(longitude.toFixed(6));
 
-    const place = await getPlaceName(lat, lng).catch(() => "Unknown");
+    // const place = await getPlaceName(lat, lng).catch(() => "Unknown");
 
-    const res = await punchInApi({ lat, lng, place_name: place });
+    const res = await punchInApi({ lat, lng,  });
 
     console.log("✅ PunchIn API success");
 
@@ -82,9 +82,9 @@ const handlePunchIn = async () => {
 
     const lat = Number(latitude.toFixed(6));
     const lng = Number(longitude.toFixed(6));
-    const place = await getPlaceName(lat, lng).catch(() => "Unknown");
+    // const place = await getPlaceName(lat, lng).catch(() => "Unknown");
 
-    punchOutRes = await punchOutApi({ lat, lng, place_name: place });
+    punchOutRes = await punchOutApi({ lat, lng, });
     console.log("✅ PunchOut API success");
   } catch (error) {
     console.log("❌ Punch Out Error (will still stop tracking):", error);

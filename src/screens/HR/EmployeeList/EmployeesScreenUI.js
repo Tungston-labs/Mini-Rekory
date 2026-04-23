@@ -107,37 +107,41 @@ const EmployeesScreenUI = ({
 
 
         <FlatList
-  style={{ flex: 1 }}
-  data={employees}
-  keyExtractor={(item) => item.id.toString()}
-  contentContainerStyle={{ paddingBottom: 120 }}
-  refreshControl={
-    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
-  }
-  onEndReached={loadMore}
-  onEndReachedThreshold={0.3}
-  ListFooterComponent={
-    isFetchingNextPage ? (
-      <View style={{ padding: 20 }}>
-        <Text style={{ textAlign: "center" }}>Loading more...</Text>
-      </View>
-    ) : null
-  }
-         renderItem={({ item, index }) => (
-  <View>
-    <EmployeeRow
-      name={item.name}
-      location={item.location?.split(",")[0]}
-      status={item.status}
-      onPress={() => {
-        console.log("Clicked employee:", item);
-        onEmployeePress(item);
-      }}
-    />
+          style={{ flex: 1 }}
+          data={employees}
+          keyExtractor={(item, index) =>
+            item?.id ? item.id.toString() : index.toString()
+          }
+          contentContainerStyle={{ paddingBottom: 120 }}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+          }
+          onEndReached={loadMore}
+          onEndReachedThreshold={0.3}
+          ListFooterComponent={
+            isFetchingNextPage ? (
+              <View style={{ padding: 20 }}>
+                <Text style={{ textAlign: "center" }}>Loading more...</Text>
+              </View>
+            ) : null
+          }
+          renderItem={({ item, index }) => {
+            if (!item) return null;
 
-    {index !== employees.length - 1 && <View style={styles.hr} />}
-  </View>
-)}
+            return (
+              <View>
+                <EmployeeRow
+                  name={item.name}
+                  location={item.location}
+                  status={item.status === "Active"}
+                  onPress={() => onEmployeePress(item)}
+                  profile_pic={item.profile_pic}
+                    first_punch_in={item.first_punch_in}
+                />
+                {index !== employees.length - 1 && <View style={styles.hr} />}
+              </View>
+            );
+          }}
         />
 
         {/* Floating Add Button */}

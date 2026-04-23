@@ -123,6 +123,7 @@ console.log("loded home")
                   location={emp.location}
                   time={emp.time}
                   status={emp.status}
+                 profile_pic = {emp.profile_pic}
                 />
               ))}
             </View>

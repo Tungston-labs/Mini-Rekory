@@ -41,21 +41,40 @@ export const getEmployeeDetails = async (id) => {
 };
 
 export const getEmployeeRoute = async (id, date) => {
-  const res = await api.get(`/attendance/employees/${id}/route/?date=${date}`);
+  try {
+    const res = await api.get(
+      `/attendance/employees/${id}/route/`,
+      { params: { date } }
+    );
 
-  const route = res.data.route || [];
-  const sortedRoute = route.sort(
-    (a, b) => new Date(b.recorded_at) - new Date(a.recorded_at)
-  );
+    const route = res.data.route || [];
 
-  return sortedRoute.map((item, index) => ({
-    place: item.place_name ? item.place_name.split(",")[0].trim() : "Unknown location",
-    time: new Date(item.recorded_at).toLocaleTimeString("en-IN", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
-    current: index === 0, 
-  }));
+    const sortedRoute = route.sort(
+      (a, b) => new Date(a.recorded_at) - new Date(b.recorded_at)
+    );
+
+    return sortedRoute.map((item, index, arr) => ({
+      place: item.place_name
+        ? item.place_name.split(",")[0].trim()
+        : "Unknown location",
+
+      time: item.recorded_at
+        ? new Date(item.recorded_at).toLocaleTimeString("en-IN", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+          })
+        : "",
+
+      current: index === arr.length - 1,
+    }));
+  } catch (err) {
+    // If backend returns "Attendance not found"
+    if (err?.response?.data?.message === "Attendance not found") {
+      return []; // ✅ return empty route instead of crashing
+    }
+    throw err;
+  }
 };
 
 

@@ -1,19 +1,25 @@
 import React from "react";
 import { View, Text, Image, TouchableOpacity } from "react-native";
-import { MapPin, CaretRight } from "phosphor-react-native";
+import { MapPin, CaretRight,User } from "phosphor-react-native";
 import styles from "./style";
 
-const EmployeeRow = ({ name, location, time, status, showDivider = true }) => {
+const EmployeeRow = ({ name, location, time,profile_pic, status, showDivider = true }) => {
   const active = status === "active";
 
   return (
     <>
     
       <TouchableOpacity style={styles.row}>
-        <Image
-          source={{ uri: "https://i.pravatar.cc/150" }}
-          style={styles.avatar}
-        />
+    {profile_pic ? (
+  <Image
+    source={{ uri: profile_pic }}
+    style={styles.avatar}
+  />
+) : (
+  <View style={styles.avatarFallback}>
+    <User size={32} color="#999" />
+  </View>
+)}
 
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
