@@ -56,7 +56,7 @@ const sendLocationToServer = async (coords) => {
     const now = Date.now();
 
     // ✅ BLOCK if within 1 minute
-    if (now - lastSentTime < 60000) {
+    if (now - lastSentTime < 90000) {
       console.log("⏳ Skipping - sent recently");
       return;
     }
@@ -115,7 +115,7 @@ export const startTracking = async () => {
     } catch (err) {
       console.log("❌ Tracking error:", err);
     }
-  }, 120000); 
+  }, 900000); 
 
   console.log("🚀 Tracking started");
 };

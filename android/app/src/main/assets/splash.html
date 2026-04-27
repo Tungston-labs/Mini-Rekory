@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Attnd — Splash Screen</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@300;800&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    width: 100vw;
+    height: 100vh;
+    background: #AD0D0E;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    font-family: 'Nunito', sans-serif;
+  }
+
+  .splash {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+  }
+
+  /* ── Pulse rings ── */
+  .rings {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ring {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px solid white;
+    animation: pulse-ring 2.4s ease-out infinite;
+    opacity: 0;
+  }
+  .ring-1 { width: 200px; height: 200px; animation-delay: 0s; }
+  .ring-2 { width: 160px; height: 160px; animation-delay: 0.3s; }
+
+  @keyframes pulse-ring {
+    0%   { opacity: 0; transform: scale(0.6); }
+    30%  { opacity: 0.7; }
+    100% { opacity: 0; transform: scale(1.1); }
+  }
+
+  /* ── Main disc ── */
+  .disc {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 2;
+    animation: disc-pop 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.3s both;
+  }
+
+  @keyframes disc-pop {
+    from { transform: scale(0); opacity: 0; }
+    to   { transform: scale(1); opacity: 1; }
+  }
+
+  /* ── Person inside disc ── */
+  .person {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    margin-top: -6px;
+  }
+  .person-head {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    background: #AD0D0E;
+  }
+  .person-body {
+    width: 46px; height: 24px;
+    background: #AD0D0E;
+    border-radius: 23px 23px 0 0;
+  }
+
+  /* ── GPS badge ── */
+  .badge {
+    position: absolute;
+    bottom: 4px; right: 4px;
+    width: 38px; height: 38px;
+    border-radius: 50%;
+    background: #BA7517;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1px;
+    z-index: 3;
+    animation: badge-bounce 0.6s cubic-bezier(0.34,1.56,0.64,1) 0.8s both;
+  }
+  @keyframes badge-bounce {
+    from { transform: scale(0) rotate(-30deg); opacity: 0; }
+    to   { transform: scale(1) rotate(0deg);   opacity: 1; }
+  }
+  .badge-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: #FAEEDA;
+  }
+  .badge-tail {
+    width: 3px; height: 7px;
+    background: #FAEEDA;
+    border-radius: 2px;
+  }
+
+  /* ── Punch-card notch ── */
+  .notch {
+    position: absolute;
+    top: 6px; right: 6px;
+    width: 30px; height: 18px;
+    background: #FAEEDA;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    z-index: 3;
+    animation: notch-slide 0.5s ease 1s both;
+  }
+  @keyframes notch-slide {
+    from { transform: translateY(-10px); opacity: 0; }
+    to   { transform: translateY(0);     opacity: 1; }
+  }
+  .notch-hole {
+    width: 3px; height: 8px;
+    background: #BA7517;
+    border-radius: 2px;
+  }
+
+  /* ── Wordmark ── */
+  .wordmark {
+    margin-top: 28px;
+    display: flex;
+    align-items: baseline;
+    gap: 0;
+    animation: word-up 0.6s ease 1s both;
+  }
+  @keyframes word-up {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+  .wm-bold {
+    font-size: 56px;
+    font-weight: 800;
+    color: white;
+    letter-spacing: -2px;
+    line-height: 1;
+  }
+  .wm-light {
+    font-size: 56px;
+    font-weight: 300;
+    color: #BA7517;
+    letter-spacing: 4px;
+    line-height: 1;
+  }
+
+  /* ── Tagline ── */
+  .tagline {
+    margin-top: 10px;
+    font-size: 11px;
+    font-weight: 400;
+    letter-spacing: 4px;
+    color: rgba(255,255,255,0.6);
+    animation: word-up 0.6s ease 1.2s both;
+  }
+
+  /* ── Loader bar ── */
+  .loader-wrap {
+    margin-top: 40px;
+    width: 160px;
+    height: 3px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 2px;
+    overflow: hidden;
+    animation: word-up 0.4s ease 1.4s both;
+  }
+  .loader-bar {
+    height: 100%;
+    width: 0%;
+    background: #3C3489;
+    border-radius: 2px;
+    animation: load 2s ease 1.5s forwards;
+  }
+  @keyframes load {
+    0%   { width: 0%; background: white; }
+    60%  { background: #03B30F; }
+    100% { width: 100%; background: #03B30F; }
+  }
+
+  /* ── Floating particles ── */
+  .particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+  }
+  .particle {
+    position: absolute;
+    border-radius: 50%;
+    background: #7F77DD;
+    opacity: 0;
+    animation: float-particle linear infinite;
+  }
+
+  @keyframes float-particle {
+    0%   { transform: translateY(100vh) scale(0); opacity: 0; }
+    10%  { opacity: 0.4; }
+    90%  { opacity: 0.2; }
+    100% { transform: translateY(-20vh) scale(1); opacity: 0; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Floating particles -->
+<div class="particles" id="particles"></div>
+
+<div class="splash">
+  <div class="rings">
+    <div class="ring ring-1"></div>
+    <div class="ring ring-2"></div>
+
+    <div class="disc">
+      <div class="person">
+        <div class="person-head"></div>
+        <div class="person-body"></div>
+      </div>
+      <div class="badge">
+        <div class="badge-dot"></div>
+        <div class="badge-tail"></div>
+      </div>
+      <div class="notch">
+        <div class="notch-hole"></div>
+        <div class="notch-hole"></div>
+        <div class="notch-hole"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="wordmark">
+    <span class="wm-bold">AT</span>
+    <span class="wm-light">tnd</span>
+  </div>
+
+  <div class="tagline">KNOW WHO. KNOW WHERE.</div>
+
+  <div class="loader-wrap">
+    <div class="loader-bar"></div>
+  </div>
+</div>
+
+<script>
+  const p = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const d = document.createElement('div');
+    d.className = 'particle';
+    const size = Math.random() * 6 + 3;
+    d.style.cssText = `
+      width: ${size}px;
+      height: ${size}px;
+      left: ${Math.random() * 100}%;
+      animation-duration: ${Math.random() * 8 + 6}s;
+      animation-delay: ${Math.random() * 6}s;
+      opacity: 0;
+      background: ${Math.random() > 0.5 ? 'rgba(255,255,255,0.3)' : '#03B30F'};
+    `;
+    p.appendChild(d);
+  }
+</script>
+</body>
+</html>

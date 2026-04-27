@@ -11,7 +11,7 @@ import styles from "./style";
 import { MapPin } from "phosphor-react-native";
 import { ArrowRight } from "phosphor-react-native";
 import { useEffect } from "react";
-const TrackScreen = ({ navigation }) => {
+const TrackScreen = ({ onNext }) => {
   const leftPinAnim = useRef(new Animated.Value(0)).current;
 const rightPinAnim = useRef(new Animated.Value(0)).current;
 
@@ -37,20 +37,9 @@ useEffect(() => {
 }, []);
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
-  const handleNext = () => {
-    Animated.spring(scaleAnim, {
-      toValue: 0.95,
-      mass: 1,
-      stiffness: 7.2,
-      damping: 6,
-      useNativeDriver: true,
-    }).start(() => {
-      scaleAnim.setValue(1);
-  navigation.navigate("StartingScreen");
-
-    });
-  };
-
+ const handleNext = () => {
+  onNext(); // direct call
+};
   return (
     <ImageBackground
       source={require("../../../assets/images/trackbg.png")}

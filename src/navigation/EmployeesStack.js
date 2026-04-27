@@ -1,27 +1,58 @@
-import React from "react";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import React, { useState, useEffect } from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { useAuth } from "../context/AuthContext";
 
-import EmployeesScreen from "../screens/HR/EmployeeList";
-import EmployeeDetailsScreen from "../screens/HR/EmployeeDetails";
-import AddEmployeeScreen from "../screens/HR/AddEmployee";
+import AppNavigator from "./AppNavigator";
+import EmployeeNavigator from "./EmployeeNavigator";
+import AuthNavigator from "./AuthNavigator";
 
-const Stack = createNativeStackNavigator();
+import SplashScreen from "../screens/SplashScreen";
+import TrackScreen from "../screens/TrackScreen";
 
-const EmployeesStack = () => {
+const RootNavigator = () => {
+  const { userRole, loading } = useAuth();
+
+  const [showSplash, setShowSplash] = useState(true);
+  const [showTracking, setShowTracking] = useState(false);
+
+  // ✅ Splash timer
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 3000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  // ✅ After StartingScreen triggers tracking
+  useEffect(() => {
+    if (showTracking) {
+      const timer = setTimeout(() => {
+        setShowTracking(false);
+      }, 2000); // tracking screen time
+
+      return () => clearTimeout(timer);
+    }
+  }, [showTracking]);
+
+  // ✅ STEP 1: Splash
+  if (showSplash) {
+    return <SplashScreen />;
+  }
+
+  // ✅ STEP 3: TrackScreen (after button click)
+  if (showTracking) {
+    return <TrackScreen />;
+  }
+
+  // ✅ STEP 2: Navigation (StartingScreen is inside AuthNavigator)
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen
-        name="EmployeesList"
-        component={EmployeesScreen}
-      />
-      <Stack.Screen
-        name="EmployeeDetails"
-        component={EmployeeDetailsScreen}
-      />
-       <Stack.Screen name="AddEmployee" component={AddEmployeeScreen} />
-    </Stack.Navigator>
-
+    <NavigationContainer>
+      {!userRole && <AuthNavigator setShowTracking={setShowTracking} />}
+      {userRole === "company" && <AppNavigator />}
+      {userRole === "employee" && <EmployeeNavigator />}
+    </NavigationContainer>
   );
 };
 
-export default EmployeesStack;
+export default RootNavigator;
