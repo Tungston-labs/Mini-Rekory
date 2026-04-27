@@ -8,7 +8,7 @@ import {
   Platform,
   RefreshControl,
 } from "react-native";
-import { CaretLeft, PhoneCall, CalendarDots, MapPin ,User} from "phosphor-react-native";
+import { CaretLeft, PhoneCall, CalendarDots, MapPin, User } from "phosphor-react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import styles from "./style";
 import DateTimePicker from "@react-native-community/datetimepicker";
@@ -41,51 +41,51 @@ const EmployeeDetailsView = ({
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#F6F7F8" }} edges={["top"]}>
       <View style={styles.container}>
-       <View style={styles.profileCard}>
+        <View style={styles.profileCard}>
 
-  {/* Top Row */}
-  <View style={styles.topRow}>
-    
-    <TouchableOpacity onPress={onBack} style={styles.backBtn}>
-      <CaretLeft size={24} />
-    </TouchableOpacity>
+          {/* Top Row */}
+          <View style={styles.topRow}>
 
-   {employee.photo ? (
-  <Image
-    source={{ uri: employee.photo }}
-    style={styles.avatar}
-  />
-) : (
-  <View style={styles.avatarFallback}>
-    <User size={32} color="#999" />
-  </View>
-)}
+            <TouchableOpacity onPress={onBack} style={styles.backBtn}>
+              <CaretLeft size={24} />
+            </TouchableOpacity>
 
-    <View style={{ flex: 1 }} />
+            {employee.photo ? (
+              <Image
+                source={{ uri: employee.photo }}
+                style={styles.avatar}
+              />
+            ) : (
+              <View style={styles.avatarFallback}>
+                <User size={32} color="#999" />
+              </View>
+            )}
 
-<TouchableOpacity
-  style={styles.callBtn}
-  onPress={() => {
-    if (employee.phone) {
-      Linking.openURL(`tel:${employee.phone}`);
-    }
-  }}
->
-  <PhoneCall size={18} color="#fff" />
-</TouchableOpacity>
+            <View style={{ flex: 1 }} />
 
-  </View>
+            <TouchableOpacity
+              style={styles.callBtn}
+              onPress={() => {
+                if (employee.phone) {
+                  Linking.openURL(`tel:${employee.phone}`);
+                }
+              }}
+            >
+              <PhoneCall size={18} color="#fff" />
+            </TouchableOpacity>
 
-  {/* Details Section */}
-  <View style={styles.profileInfo}>
-    <Text style={styles.name}>{employee.name}</Text>
+          </View>
 
-    <InfoRow label="Job Title" value={employee.jobTitle} />
-    <InfoRow label="Department" value={employee.department} />
-    <InfoRow label="Email" value={employee.email} />
-  </View>
+          {/* Details Section */}
+          <View style={styles.profileInfo}>
+            <Text style={styles.name}>{employee.name}</Text>
 
-</View>
+            <InfoRow label="Job Title" value={employee.jobTitle} />
+            <InfoRow label="Department" value={employee.department} />
+            <InfoRow label="Email" value={employee.email} />
+          </View>
+
+        </View>
 
         <View style={styles.locationCard}>
           <View style={styles.locationHeader}>
@@ -139,7 +139,7 @@ const EmployeeDetailsView = ({
                   </View>
 
                   <View style={styles.locationInfo}>
-       <Text style={styles.place}>{item.place || "Unknown location"}</Text>
+                    <Text style={styles.place}>{item.place || "Unknown location"}</Text>
                     <Text style={styles.time}>{item.time}</Text>
 
                     {item.current && (

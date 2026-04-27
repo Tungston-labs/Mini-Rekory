@@ -19,12 +19,16 @@ header: {
 profileWrapper: {
   alignItems: "center",
   marginTop: -(width * 0.22), 
+
 },
 
 profileImage: {
   width: width * 0.30,
   height: width * 0.30,
   borderRadius: width * 0.15,
+    borderRadiuscolor: "#fff",
+   borderWidth: 1,
+   borderColor: "#fff",
 },
 
 name: {

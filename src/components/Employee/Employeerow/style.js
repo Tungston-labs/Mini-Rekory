@@ -6,13 +6,14 @@ export default StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#FFF",
     padding: 10,
-    // borderRadius: 16,
-    // marginBottom: 12,
+    alignItems: "center",
+        paddingHorizontal: 14,
+        paddingVertical: 14,
   },
   avatar: {
-    width: 50,
-    height: 50,
-    borderRadius: 30,
+    width: 45,
+    height: 45,
+    borderRadius: 50,
   },
   info: {
     flex: 1,
@@ -48,27 +49,34 @@ export default StyleSheet.create({
     width: 10,
     height: 10,
     borderRadius: 5,
-    marginBottom: 6,           
+    marginBottom: 6,
   },
 
   timeRow: {
-    flexDirection: "row",           
-    alignItems: "center",           
+    flexDirection: "row",
+    alignItems: "center",
   },
 
   time: {
     fontSize: 14,
     color: "#999",
-    marginRight: 4,  
-    fontFamily: "PoppinsRegular",             
+    marginRight: 4,
+    fontFamily: "PoppinsRegular",
   },
-  
+
   avatarFallback: {
-  width: 50,
-  height: 50,
-  borderRadius: 25,
-  backgroundColor: "#E0E0E0",
-  justifyContent: "center",
-  alignItems: "center",
-},
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#C61217",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  avatarText: {
+    fontSize: 16,
+    color: "#fff",
+    fontFamily: "PoppinsMedium",
+    alignItems: "center",
+    justifyContent: "center",
+  },
 });

@@ -55,4 +55,19 @@ divider: {
   marginLeft: 30,
     marginRight: 30,
 },
+  avatarFallback: {
+  width: 40,
+  height: 40,
+  borderRadius: 20,
+  backgroundColor: "#C61217",
+  justifyContent: "center",
+  alignItems: "center",
+},
+avatarText: {
+  fontSize: 16,
+  color: "#fff",
+  fontFamily: "PoppinsMedium",
+  alignItems:"center",
+  justifyContent:"center",
+},
 });

@@ -112,13 +112,20 @@ export default StyleSheet.create({
     fontWeight: "600",
   },
   
-  dropdown: {
+dropdown: {
   height: 48,
-    borderWidth: 1,
-    borderColor: "#E0E0E0",
-    borderRadius: 8,
-    fontSize: 12,
-    color: "#000",
-    backgroundColor: "#FFF",
-}
+  borderWidth: 1,
+  borderColor: "#E0E0E0",
+  borderRadius: 8,
+  backgroundColor: "#FFF",
+  justifyContent: "center",
+  overflow: "hidden",
+},
+
+picker: {
+  height: 60,
+  width: "100%",
+  color: "#000",
+  fontSize:10,
+},
 });

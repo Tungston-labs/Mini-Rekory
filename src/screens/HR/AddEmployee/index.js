@@ -19,6 +19,7 @@ import { launchImageLibrary } from "react-native-image-picker";
 import styles from "./style";
 import { useCreateEmployee } from "../../../hooks/hr/useEmployees";
 import { useDepartments } from "../../../hooks/hr/useDepartments";
+import CustomDropdown from "../../../components/CustomDropdown/CustomDropdown";
 const AddEmployeeScreen = () => {
   const navigation = useNavigation();
   const { handleCreateEmployee, loading } = useCreateEmployee();
@@ -163,20 +164,12 @@ const AddEmployeeScreen = () => {
             {isLoading ? (
               <ActivityIndicator size="small" />
             ) : (
-              <Picker
-                selectedValue={form.department}
-                onValueChange={(value) => handleChange("department", value)}
-              >
-                <Picker.Item label="Select Department" value="" />
-
-                {departments.map((dept) => (
-                  <Picker.Item
-                    key={dept.id}
-                    label={dept.name}
-                    value={dept.id}
-                  />
-                ))}
-              </Picker>
+            <CustomDropdown
+    placeholder="Select Department"
+    value={form.department}
+    onChange={(value) => handleChange("department", value)}
+    options={departments.map((dept) => ({ label: dept.name, value: dept.id }))}
+/>
             )}
           </View>
           <Text style={styles.label}>Contact Number</Text>
@@ -243,35 +236,44 @@ const AddEmployeeScreen = () => {
 
           <Text style={styles.label}>Gender</Text>
           <View style={styles.dropdown}>
-            <Picker selectedValue={form.gender} onValueChange={(value) => handleChange("gender", value)}>
-              <Picker.Item label="Select Gender" value="" />
-              <Picker.Item label="Male" value="male" />
-              <Picker.Item label="Female" value="female" />
-              <Picker.Item label="Other" value="other" />
-            </Picker>
+            <CustomDropdown
+    placeholder="Select Gender"
+    value={form.gender}
+    onChange={(value) => handleChange("gender", value)}
+    options={[
+        { label: "Male", value: "male" },
+        { label: "Female", value: "female" },
+        { label: "Other", value: "other" },
+    ]}
+/>
           </View>
 
           <Text style={styles.label}>Employment Type</Text>
           <View style={styles.dropdown}>
-            <Picker
-              selectedValue={form.employmentType}
-              onValueChange={(value) => handleChange("employmentType", value)}
-            >
-              <Picker.Item label="Select Employment Type" value="" />
-              <Picker.Item label="Full Time" value="full_time" />
-              <Picker.Item label="Part Time" value="part_time" />
-              <Picker.Item label="Contract" value="contract" />
-            </Picker>
+            <CustomDropdown
+    placeholder="Select Employment Type"
+    value={form.employmentType}
+    onChange={(value) => handleChange("employmentType", value)}
+    options={[
+        { label: "Full Time", value: "full_time" },
+        { label: "Part Time", value: "part_time" },
+        { label: "Contract", value: "contract" },
+    ]}
+/>
           </View>
 
           <Text style={styles.label}>Role</Text>
           <View style={styles.dropdown}>
-            <Picker selectedValue={form.role} onValueChange={(value) => handleChange("role", value)}>
-              <Picker.Item label="Select Role" value="" />
-              <Picker.Item label="Admin" value="admin" />
-              <Picker.Item label="Manager" value="manager" />
-              <Picker.Item label="Employee" value="employee" />
-            </Picker>
+           <CustomDropdown
+    placeholder="Select Role"
+    value={form.role}
+    onChange={(value) => handleChange("role", value)}
+    options={[
+        // { label: "Admin", value: "admin" },
+        // { label: "Manager", value: "manager" },
+        { label: "Employee", value: "employee" },
+    ]}
+/>
           </View>
         </View>
 

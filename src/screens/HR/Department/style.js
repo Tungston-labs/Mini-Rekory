@@ -47,9 +47,9 @@ export default StyleSheet.create({
         paddingVertical: 16,
     },
     avatar: {
-        width: 40,
-        height: 40,
-        borderRadius: 20,
+        width: 45,
+        height: 45,
+        borderRadius: 50,
         backgroundColor: "#C61217",
         alignItems: "center",
         justifyContent: "center",

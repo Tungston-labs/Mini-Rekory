@@ -132,13 +132,13 @@ const EmployeesScreenUI = ({
               <View>
                 <EmployeeRow
                   name={item.name}
-                  location={item.location}
+                 location={item?.current_location?.place?.split(",")[0]}
                   status={item.status === "Active"}
                   onPress={() => onEmployeePress(item)}
                   profile_pic={item.profile_pic}
                     first_punch_in={item.first_punch_in}
                 />
-                {index !== employees.length - 1 && <View style={styles.hr} />}
+                {index !== employees.length - 1 && <View style={styles.separator} />}
               </View>
             );
           }}

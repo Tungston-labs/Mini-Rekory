@@ -86,6 +86,9 @@ employeeList: {
     width: 40,
     height: 40,
     borderRadius: 22,
+
+   borderWidth: 0.5,
+  //  borderColor: "#fff",
   },
   profileIcon: {
   width: 50,

@@ -50,10 +50,10 @@ export default StyleSheet.create({
     paddingHorizontal: 20,        
     marginTop:20,
   },
-  hr: {
+  separator: {
     height: 1,
-    backgroundColor: "#E0E0E0",
-    marginVertical: 2,
+   
+    
   },
   fab: {
     position: "absolute",

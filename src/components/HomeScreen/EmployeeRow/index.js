@@ -16,9 +16,11 @@ const EmployeeRow = ({ name, location, time,profile_pic, status, showDivider = t
     style={styles.avatar}
   />
 ) : (
-  <View style={styles.avatarFallback}>
-    <User size={32} color="#999" />
-  </View>
+<View style={styles.avatarFallback}>
+  <Text style={styles.avatarText}>
+    {name ? name.charAt(0).toUpperCase() : "?"}
+  </Text>
+</View>
 )}
 
         <View style={styles.info}>

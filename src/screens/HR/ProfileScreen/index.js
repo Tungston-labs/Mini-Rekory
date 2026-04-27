@@ -119,28 +119,28 @@ const logoUrl = company?.logo
         {/* Info */}
         <InfoCard title="Company Information">
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Company Name</Text>
+            <Text style={styles.label}>Company Name :</Text>
             <Text style={styles.value}>
               {company.company_name || "N/A"}
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>Email :</Text>
             <Text style={styles.value}>
               {company.email || "N/A"}
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Phone</Text>
+            <Text style={styles.label}>Phone :</Text>
             <Text style={styles.value}>
               {company.contact_number || "N/A"}
             </Text>
           </View>
 
           <View style={styles.infoRow}>
-            <Text style={styles.label}>Registration Date</Text>
+            <Text style={styles.label}>Registration Date :</Text>
             <Text style={styles.value}>
               {company.registration_date || "N/A"}
             </Text>
@@ -149,11 +149,11 @@ const logoUrl = company?.logo
 
         {/* Buttons */}
         <TouchableOpacity style={styles.TermsButton}>
-          <Text style={styles.PolicyText}>Terms & Conditions</Text>
+          <Text style={styles.PolicyText}>Terms & Conditions :</Text>
         </TouchableOpacity>
 
         <TouchableOpacity style={styles.PolicyButton}>
-          <Text style={styles.PolicyText}>Privacy Policy</Text>
+          <Text style={styles.PolicyText}>Privacy Policy :</Text>
         </TouchableOpacity>
 
         <TouchableOpacity

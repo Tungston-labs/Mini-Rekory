@@ -28,6 +28,7 @@ const HomeScreenUI = ({
   isError,
   isFetching,
   onRefresh,
+  navigation
 }) => {
 console.log("loded home")
   if (isLoading) {
