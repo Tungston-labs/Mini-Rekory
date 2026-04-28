@@ -14,7 +14,6 @@ const SplashScreen = ({ onFinish }) => {
   const ring2Opacity = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
-    // Pulse rings loop
     const pulseRing = (scaleRef, opacityRef, delay) => {
       Animated.loop(
         Animated.sequence([
